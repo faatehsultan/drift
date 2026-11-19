@@ -18,6 +18,8 @@ enum LiveActivity: Equatable {
     case idle, agent, timer, meeting(CalEvent), music
 }
 
+enum MediaSource: Equatable { case drift, external }
+
 enum Anim {
     static let morph = Animation.spring(response: 0.44, dampingFraction: 0.8)
     static let tab = Animation.spring(response: 0.34, dampingFraction: 0.88)
@@ -76,6 +78,7 @@ final class NotchModel: ObservableObject {
     let battery = BatteryModel()
     let agent = AgentModel()
     let lyrics = LyricsModel()
+    let external = ExternalMediaModel()
 
     var openSignInWindow: () -> Void = {}
     var openSettings: () -> Void = {}
@@ -131,6 +134,7 @@ final class NotchModel: ObservableObject {
 
         $query.dropFirst().removeDuplicates().sink { [weak self] q in self?.queryChanged(q) }.store(in: &cancellables)
         agent.start()
+        setUpExternalMedia()
     }
 
     var needsSignIn: Bool { showSignIn && !signedIn }
@@ -141,8 +145,90 @@ final class NotchModel: ObservableObject {
         if showingApproval { return .agent }
         if settings.isOn(.timer) && timer.active { return .timer }
         if settings.isOn(.meetings), let e = calendar.imminent { return .meeting(e) }
-        if settings.isOn(.music) && player.current != nil { return .music }
+        if settings.isOn(.music) && activeSource != nil { return .music }
         return .idle
+    }
+
+    // MARK: Which player is in control
+
+    /// What another app is playing, unless it's really Drift's own player showing up in Now Playing.
+    var externalInfo: ExternalInfo? {
+        guard settings.externalMedia, let e = external.info else { return nil }
+        if let t = player.current, t.title == e.title, player.isPlaying { return nil }
+        return e
+    }
+
+    /// Drift's own player wins whenever it's playing. Another app takes over only while
+    /// Drift is silent; when both are paused, Drift stays in front if it has a track.
+    var activeSource: MediaSource? {
+        let ext = externalInfo
+        if player.current != nil && player.isPlaying { return .drift }
+        if let e = ext, e.playing { return .external }
+        if player.current != nil { return .drift }
+        if ext != nil { return .external }
+        return nil
+    }
+
+    var nowTitle: String? {
+        switch activeSource {
+        case .drift: return player.current?.title
+        case .external: return externalInfo?.title
+        case nil: return nil
+        }
+    }
+
+    var nowArtist: String {
+        switch activeSource {
+        case .drift: return player.current?.artist ?? ""
+        case .external: return externalInfo?.artist ?? ""
+        case nil: return ""
+        }
+    }
+
+    var nowIsPlaying: Bool {
+        switch activeSource {
+        case .drift: return player.isPlaying
+        case .external: return externalInfo?.playing ?? false
+        case nil: return false
+        }
+    }
+
+    var nowAccent: Color { activeSource == .external ? external.accent : player.accent }
+
+    func mediaToggle() {
+        if activeSource == .external { external.togglePlay() } else { player.togglePlay() }
+    }
+
+    func mediaNext() {
+        if activeSource == .external { external.next() } else { player.next() }
+    }
+
+    func mediaPrevious() {
+        if activeSource == .external { external.previous() } else { player.previous() }
+    }
+
+    private func setUpExternalMedia() {
+        player.$isPlaying.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &cancellables)
+        external.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &cancellables)
+        settings.$externalMedia.dropFirst().removeDuplicates().sink { [weak self] on in
+            if on { self?.external.start() } else { self?.external.stop() }
+        }.store(in: &cancellables)
+
+        // One thing at a time: Drift starting pauses the other app...
+        player.willStartPlaying = { [weak self] in
+            guard let self = self, self.settings.exclusiveAudio, let e = self.externalInfo, e.playing else { return }
+            self.external.pauseForDrift()
+        }
+        // ...and another app starting pauses Drift.
+        external.onStartedPlaying = { [weak self] in
+            guard let self = self, self.settings.exclusiveAudio, self.player.isPlaying, self.externalInfo != nil else { return }
+            self.player.pauseForOtherAudio()
+        }
+        external.onTrackChanged = { [weak self] in
+            guard let self = self, self.settings.isOn(.trackPeek), self.activeSource == .external else { return }
+            self.peek(.track)
+        }
+        if settings.externalMedia { external.start() }
     }
 
     /// Size of the black shape (without the top flares) for the current state.
@@ -161,7 +247,7 @@ final class NotchModel: ObservableObject {
                 return CGSize(width: w, height: n.height + 262)
             case .music:
                 if needsSignIn { return CGSize(width: w, height: n.height + 200) }
-                if currentMusicTab == .player { return CGSize(width: w, height: n.height + (player.current == nil ? 170 : 196)) }
+                if currentMusicTab == .player { return CGSize(width: w, height: n.height + (activeSource == nil ? 170 : 196)) }
                 return CGSize(width: w, height: n.height + 380)
             case .tray:
                 return CGSize(width: w, height: n.height + (tray.visibleItems.isEmpty ? 176 : 216))
@@ -177,7 +263,7 @@ final class NotchModel: ObservableObject {
 
     func peek(_ kind: PeekKind) {
         guard state != .expanded else { return }
-        if kind == .track && player.current == nil { return }
+        if kind == .track && nowTitle == nil { return }
         peekTask?.cancel()
         peekKind = kind
         withAnimation(Anim.morph) { state = .peek }

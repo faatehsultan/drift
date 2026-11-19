@@ -103,9 +103,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let optCmd = optionKey | cmdKey
         hk.register(keyCode: kVK_Space, modifiers: opt) { [weak self] in self?.notch.toggleFromHotkey() }
         hk.register(keyCode: kVK_ANSI_F, modifiers: optCmd) { [weak self] in self?.notch.openSearch() }
-        hk.register(keyCode: kVK_ANSI_P, modifiers: optCmd) { [weak self] in self?.player.togglePlay() }
-        hk.register(keyCode: kVK_RightArrow, modifiers: optCmd) { [weak self] in self?.player.next() }
-        hk.register(keyCode: kVK_LeftArrow, modifiers: optCmd) { [weak self] in self?.player.previous() }
+        hk.register(keyCode: kVK_ANSI_P, modifiers: optCmd) { [weak self] in self?.model.mediaToggle() }
+        hk.register(keyCode: kVK_RightArrow, modifiers: optCmd) { [weak self] in self?.model.mediaNext() }
+        hk.register(keyCode: kVK_LeftArrow, modifiers: optCmd) { [weak self] in self?.model.mediaPrevious() }
         hk.register(keyCode: kVK_UpArrow, modifiers: optCmd) { [weak self] in self?.player.nudgeVolume(0.08) }
         hk.register(keyCode: kVK_DownArrow, modifiers: optCmd) { [weak self] in self?.player.nudgeVolume(-0.08) }
         hk.register(keyCode: kVK_ANSI_L, modifiers: optCmd) { [weak self] in self?.player.toggleLike() }

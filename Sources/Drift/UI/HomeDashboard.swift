@@ -77,7 +77,22 @@ struct NowPlayingCard: View {
 
     var body: some View {
         Card(action: { model.select(.player) }) {
-            if let t = player.current {
+            if model.activeSource == .external, let e = model.externalInfo {
+                HStack(spacing: 10) {
+                    ExternalArt(image: e.artwork, size: 80, radius: 12)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(e.title).font(.system(size: 13, weight: .semibold)).foregroundColor(.white).lineLimit(2)
+                        Text(e.appName).font(.system(size: 11)).foregroundColor(.dim).lineLimit(1)
+                        Spacer(minLength: 0)
+                        HStack(spacing: 0) {
+                            IconButton(systemName: "backward.fill", size: 12) { model.external.previous() }
+                            IconButton(systemName: e.playing ? "pause.fill" : "play.fill", size: 14) { model.external.togglePlay() }
+                            IconButton(systemName: "forward.fill", size: 12) { model.external.next() }
+                        }
+                        .offset(x: -8)
+                    }
+                }
+            } else if let t = player.current {
                 HStack(spacing: 10) {
                     Art(t.thumbnail, size: 80, radius: 12)
                     VStack(alignment: .leading, spacing: 2) {

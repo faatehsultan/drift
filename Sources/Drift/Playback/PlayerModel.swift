@@ -22,6 +22,8 @@ final class PlayerModel: ObservableObject, AudioEngineDelegate {
     @Published private(set) var accent: Color = .white
 
     let trackChanged = PassthroughSubject<Track, Never>()
+    /// Called right before Drift starts making sound (used to pause other apps).
+    var willStartPlaying: () -> Void = {}
     private let engine = AudioEngine()
     private var radioSeed: String?
     private var lastUserToggle = Date.distantPast
@@ -68,6 +70,7 @@ final class PlayerModel: ObservableObject, AudioEngineDelegate {
         guard let t = current else { return }
         position = 0
         duration = parseDuration(t.durationText) ?? 0
+        willStartPlaying()
         isPlaying = true
         isLoadingTrack = true
         isAd = false
@@ -96,7 +99,22 @@ final class PlayerModel: ObservableObject, AudioEngineDelegate {
     func togglePlay() {
         guard current != nil else { return }
         lastUserToggle = Date()
-        if isPlaying { engine.pause(); isPlaying = false } else { engine.resume(); isPlaying = true }
+        if isPlaying {
+            engine.pause()
+            isPlaying = false
+        } else {
+            willStartPlaying()
+            engine.resume()
+            isPlaying = true
+        }
+    }
+
+    /// Another app started playing: step aside.
+    func pauseForOtherAudio() {
+        guard isPlaying else { return }
+        lastUserToggle = Date()
+        engine.pause()
+        isPlaying = false
     }
 
     func next(auto: Bool = false) {

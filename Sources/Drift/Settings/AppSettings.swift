@@ -139,6 +139,8 @@ final class AppSettings: ObservableObject {
     @Published var collapseDelay: Double = 0.55 { didSet { d.set(collapseDelay, forKey: "collapseDelay") } }
     @Published var meetingLead: Int = 5 { didSet { d.set(meetingLead, forKey: "meetingLead") } }
     @Published var clipboardHistory = true { didSet { d.set(clipboardHistory, forKey: "clipboardHistory") } }
+    @Published var externalMedia = true { didSet { d.set(externalMedia, forKey: "externalMedia") } }
+    @Published var exclusiveAudio = true { didSet { d.set(exclusiveAudio, forKey: "exclusiveAudio") } }
 
     init() {
         theme = Theme(rawValue: d.string(forKey: "theme") ?? "") ?? .glass
@@ -154,6 +156,8 @@ final class AppSettings: ObservableObject {
         if let v = d.object(forKey: "collapseDelay") as? Double { collapseDelay = v }
         if let v = d.object(forKey: "meetingLead") as? Int { meetingLead = v }
         if let v = d.object(forKey: "clipboardHistory") as? Bool { clipboardHistory = v }
+        if let v = d.object(forKey: "externalMedia") as? Bool { externalMedia = v }
+        if let v = d.object(forKey: "exclusiveAudio") as? Bool { exclusiveAudio = v }
     }
 
     // MARK: What's visible

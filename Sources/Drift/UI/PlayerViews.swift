@@ -5,7 +5,9 @@ struct PlayerTab: View {
     @ObservedObject var player: PlayerModel
 
     var body: some View {
-        if let t = player.current {
+        if model.activeSource == .external {
+            ExternalPlayerView(model: model, external: model.external)
+        } else if let t = player.current {
             HStack(alignment: .top, spacing: 18) {
                 Art(t.thumbnail, size: 128, radius: 14)
                     .shadow(color: player.accent.opacity(0.35), radius: 18, x: 0, y: 6)

@@ -128,9 +128,9 @@ struct CollapsedView: View {
                     Spacer(minLength: 0)
                 }
             case .music:
-                Art(player.current?.thumbnail, size: 22, radius: 6).padding(.leading, 11)
+                NowArtwork(model: model, size: 22, radius: 6).padding(.leading, 11)
                 Spacer(minLength: 0)
-                EqualizerView(playing: player.isPlaying, color: player.accent).frame(width: 18, height: 12).padding(.trailing, 13)
+                EqualizerView(playing: model.nowIsPlaying, color: model.nowAccent).frame(width: 18, height: 12).padding(.trailing, 13)
             case .timer:
                 ProgressRing(progress: timer.progress, color: timer.phase == .rest ? .green : .orange, lineWidth: 2.5)
                     .frame(width: 16, height: 16)
@@ -175,9 +175,9 @@ struct PeekView: View {
     @ViewBuilder private var detail: some View {
         switch model.peekKind {
         case .track:
-            if let t = player.current {
-                Art(t.thumbnail, size: 40, radius: 9)
-                titles(t.title, t.artist)
+            if let title = model.nowTitle {
+                NowArtwork(model: model, size: 40, radius: 9)
+                titles(title, model.nowArtist)
             }
         case .charging(let p):
             ZStack {
@@ -277,11 +277,11 @@ struct TopStrip: View {
             }
             HStack(spacing: 8) {
                 Spacer(minLength: 0)
-                if let t = player.current, model.section != .music {
+                if model.activeSource != nil, model.section != .music {
                     Button { model.select(.player) } label: {
                         HStack(spacing: 6) {
-                            EqualizerView(playing: player.isPlaying, color: player.accent, maxHeight: 10).frame(width: 14, height: 10)
-                            Art(t.thumbnail, size: 18, radius: 4)
+                            EqualizerView(playing: model.nowIsPlaying, color: model.nowAccent, maxHeight: 10).frame(width: 14, height: 10)
+                            NowArtwork(model: model, size: 18, radius: 4)
                         }
                     }
                     .buttonStyle(PressStyle())

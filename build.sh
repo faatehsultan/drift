@@ -29,6 +29,32 @@ if [ -z "$FW" ]; then
 fi
 ditto "$FW" "$APP/Contents/Frameworks/Sparkle.framework"
 
+# Media from other apps (Chrome, Safari, Spotify…): build the MediaRemote adapter
+# (BSD-3, vendored in Vendor/mediaremote-adapter). It's loaded by /usr/bin/perl, not linked.
+MRA=Vendor/mediaremote-adapter
+FWK="$APP/Contents/Frameworks/MediaRemoteAdapter.framework"
+mkdir -p "$FWK/Versions/A/Resources"
+clang -dynamiclib -fobjc-arc -fvisibility=default -O2 -mmacosx-version-min=13.0 \
+  -I "$MRA/include" -I "$MRA/src" \
+  $(find "$MRA/src/adapter" "$MRA/src/private" "$MRA/src/utility" -name '*.m' ! -name test.m) \
+  -framework Foundation -framework AppKit -framework UniformTypeIdentifiers \
+  -install_name @rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter \
+  -o "$FWK/Versions/A/MediaRemoteAdapter"
+cat > "$FWK/Versions/A/Resources/Info.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleIdentifier</key><string>com.drift.MediaRemoteAdapter</string>
+  <key>CFBundleExecutable</key><string>MediaRemoteAdapter</string>
+  <key>CFBundlePackageType</key><string>FMWK</string>
+  <key>CFBundleVersion</key><string>1</string>
+</dict></plist>
+PLIST
+ln -sfn A "$FWK/Versions/Current"
+ln -sfn Versions/Current/MediaRemoteAdapter "$FWK/MediaRemoteAdapter"
+ln -sfn Versions/Current/Resources "$FWK/Resources"
+cp "$MRA/bin/mediaremote-adapter.pl" "$APP/Contents/Resources/"
+
 codesign --force --deep --sign - "$APP" >/dev/null 2>&1 || codesign --force --deep --sign - "$APP"
 echo "Built $APP (v$VERSION, build $BUILD)"
 

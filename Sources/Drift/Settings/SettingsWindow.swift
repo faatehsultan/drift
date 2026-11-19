@@ -62,6 +62,12 @@ struct SettingsView: View {
                 Toggle("Launch at login", isOn: Binding(get: { model.launchAtLogin }, set: { _ in model.toggleLaunchAtLogin() }))
                 Toggle("Keep clipboard history", isOn: Binding(get: { settings.clipboardHistory }, set: { settings.clipboardHistory = $0 }))
             }
+            Section("Media") {
+                Toggle("Control music and video playing in other apps", isOn: Binding(get: { settings.externalMedia }, set: { settings.externalMedia = $0 }))
+                Toggle("Only one thing plays at a time", isOn: Binding(get: { settings.exclusiveAudio }, set: { settings.exclusiveAudio = $0 }))
+                Text("Chrome, Safari, Arc, Spotify, Music and more show up in the notch with play, pause, skip and seek. Drift's own player always takes priority.")
+                    .font(.caption).foregroundColor(.secondary)
+            }
             Section("About") {
                 LabeledContent("Version", value: model.appVersion)
                 Button("Check for Updates…") { model.checkForUpdates() }

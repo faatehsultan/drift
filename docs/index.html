@@ -4,214 +4,431 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Drift · your notch, finally useful</title>
-<meta name="description" content="Drift turns the MacBook notch into a live, beautiful control center: music with synced lyrics, a file tray, calendar, tools and live activities. Free.">
+<meta name="description" content="Drift turns the MacBook notch into a live control center: music with synced lyrics, media from any app, a file tray, calendar, focus timer and AI agent approvals.">
 <meta property="og:title" content="Drift · your notch, finally useful">
-<meta property="og:description" content="Music, lyrics, file tray, calendar, timers and more, right in your MacBook's notch. Free.">
-<meta property="og:image" content="https://faatehsultan.github.io/drift/logo.png">
+<meta property="og:description" content="Music, lyrics, file tray, calendar, timers and Claude Code approvals, right in your MacBook's notch.">
+<meta property="og:image" content="logo.png">
 <link rel="icon" href="favicon.png">
 <style>
   :root {
-    --bg: #07060d; --card: rgba(255,255,255,0.045); --line: rgba(255,255,255,0.08);
-    --text: #f4f2ff; --dim: rgba(244,242,255,0.62);
-    --cyan: #4fe3ff; --violet: #8b6cff; --pink: #ff5fa8;
+    --bg: #06050c; --card: rgba(255,255,255,0.04); --card2: rgba(255,255,255,0.07); --line: rgba(255,255,255,0.08);
+    --text: #f5f3ff; --dim: rgba(245,243,255,0.6); --faint: rgba(245,243,255,0.38);
+    --cyan: #4fe3ff; --violet: #8b6cff; --pink: #ff5fa8; --green: #4ade80; --orange: #ffa94d; --red: #ff6b6b;
     --grad: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink));
+    --ease: cubic-bezier(.34,1.3,.64,1);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--text); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { background: var(--bg); color: var(--text); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   a { color: inherit; text-decoration: none; }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-  .glow { position: absolute; inset: -20% -10% auto; height: 900px; background: radial-gradient(50% 45% at 50% 20%, rgba(139,108,255,0.35), transparent 70%), radial-gradient(30% 30% at 20% 40%, rgba(79,227,255,0.12), transparent 70%), radial-gradient(30% 30% at 80% 40%, rgba(255,95,168,0.12), transparent 70%); pointer-events: none; z-index: -1; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .aurora { position: fixed; inset: 0; pointer-events: none; z-index: -1; background:
+    radial-gradient(40% 35% at 50% 0%, rgba(139,108,255,0.28), transparent 70%),
+    radial-gradient(25% 25% at 12% 30%, rgba(79,227,255,0.10), transparent 70%),
+    radial-gradient(25% 25% at 88% 30%, rgba(255,95,168,0.10), transparent 70%); }
+  .noise { position: fixed; inset: 0; pointer-events: none; z-index: -1; opacity: .035; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
 
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; letter-spacing: -0.01em; }
-  .brand img { width: 34px; height: 34px; }
-  .nav-links { display: flex; gap: 26px; color: var(--dim); font-size: 14px; }
+  nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(18px); background: rgba(6,5,12,0.6); border-bottom: 1px solid transparent; transition: border-color .3s; }
+  nav.scrolled { border-color: var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+  .brand img { width: 30px; height: 30px; }
+  .nav-links { display: flex; gap: 28px; color: var(--dim); font-size: 14px; }
   .nav-links a:hover { color: var(--text); }
+  .nav-cta { font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 10px; background: #fff; color: #000; }
 
-  .hero { text-align: center; padding: 70px 0 40px; position: relative; }
+  .hero { text-align: center; padding: 72px 0 0; }
   .pill { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--dim); border: 1px solid var(--line); padding: 6px 14px; border-radius: 999px; background: var(--card); }
-  .pill b { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 600; }
-  h1 { font-size: clamp(42px, 7vw, 82px); line-height: 1.02; letter-spacing: -0.04em; font-weight: 800; margin: 22px 0 18px; }
-  h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .sub { color: var(--dim); font-size: clamp(17px, 2vw, 20px); max-width: 620px; margin: 0 auto; }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+  h1 { font-size: clamp(44px, 7.5vw, 92px); line-height: 1; letter-spacing: -0.045em; font-weight: 800; margin: 24px 0 20px; }
+  .sub { color: var(--dim); font-size: clamp(17px, 2vw, 20px); max-width: 640px; margin: 0 auto; }
   .cta { display: flex; gap: 12px; justify-content: center; margin-top: 34px; flex-wrap: wrap; }
-  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 14px; font-weight: 600; font-size: 16px; transition: transform .15s ease, box-shadow .2s ease; }
-  .btn:hover { transform: translateY(-2px); }
-  .btn.primary { background: #fff; color: #000; box-shadow: 0 10px 40px rgba(139,108,255,0.35); }
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 14px; font-weight: 600; font-size: 16px; transition: transform .2s var(--ease), box-shadow .3s; }
+  .btn:hover { transform: translateY(-2px) scale(1.02); }
+  .btn.primary { background: #fff; color: #000; box-shadow: 0 12px 50px rgba(139,108,255,0.4); }
   .btn.ghost { border: 1px solid var(--line); background: var(--card); }
-  .meta { margin-top: 14px; font-size: 13px; color: var(--dim); }
+  .meta { margin-top: 14px; font-size: 13px; color: var(--faint); }
 
-  /* Animated notch demo */
-  .stage { margin: 64px auto 0; max-width: 900px; aspect-ratio: 16 / 9; border-radius: 22px; border: 1px solid var(--line); overflow: hidden; position: relative; background: linear-gradient(160deg, #2b1b5e 0%, #12122a 45%, #2a0f2a 100%); box-shadow: 0 40px 120px rgba(0,0,0,0.6); }
-  .stage::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 50% at 70% 80%, rgba(255,95,168,0.25), transparent 70%), radial-gradient(50% 40% at 20% 70%, rgba(79,227,255,0.18), transparent 70%); }
-  .menubar { position: absolute; top: 0; left: 0; right: 0; height: 28px; background: rgba(0,0,0,0.25); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; font-size: 12px; color: rgba(255,255,255,0.8); }
-  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: #000; border-radius: 0 0 16px 16px; width: 170px; height: 28px; overflow: hidden; animation: notch 9s cubic-bezier(.5,.05,.2,1) infinite; box-shadow: 0 20px 60px rgba(0,0,0,0); }
-  @keyframes notch {
-    0%, 12% { width: 170px; height: 28px; border-radius: 0 0 16px 16px; box-shadow: 0 0 0 rgba(0,0,0,0); }
-    18%, 30% { width: 270px; height: 28px; border-radius: 0 0 16px 16px; }
-    38%, 80% { width: 62%; height: 46%; border-radius: 0 0 30px 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.55); }
-    90%, 100% { width: 270px; height: 28px; border-radius: 0 0 16px 16px; }
-  }
-  .mini { position: absolute; top: 4px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 10px; opacity: 0; animation: mini 9s infinite; }
-  @keyframes mini { 0%, 15% { opacity: 0; } 20%, 32% { opacity: 1; } 36%, 86% { opacity: 0; } 92%, 100% { opacity: 1; } }
-  .mini .art { width: 20px; height: 20px; border-radius: 5px; background: linear-gradient(135deg, var(--pink), var(--violet)); }
-  .eq { display: flex; gap: 2px; align-items: flex-end; height: 14px; margin-top: 3px; }
-  .eq i { width: 3px; border-radius: 2px; background: var(--pink); animation: eq .9s ease-in-out infinite; }
+  /* ---------- Showcase ---------- */
+  .showcase { margin: 64px auto 0; display: grid; grid-template-columns: 230px 1fr; gap: 0; border: 1px solid var(--line); border-radius: 26px; overflow: hidden; background: rgba(255,255,255,0.02); box-shadow: 0 50px 140px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.02) inset; text-align: left; }
+  .side { padding: 18px 12px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; background: rgba(0,0,0,0.25); }
+  .side h4 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 4px 10px 10px; }
+  .item { position: relative; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; cursor: pointer; color: var(--dim); font-size: 14px; font-weight: 500; transition: background .2s, color .2s; overflow: hidden; }
+  .item .ic { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-size: 14px; flex-shrink: 0; background: var(--card2); }
+  .item small { display: block; font-size: 11.5px; color: var(--faint); font-weight: 400; line-height: 1.3; }
+  .item:hover { background: var(--card); color: var(--text); }
+  .item.on { background: var(--card2); color: var(--text); }
+  .item .bar { position: absolute; left: 10px; right: 10px; bottom: 4px; height: 2px; border-radius: 2px; background: rgba(255,255,255,0.06); overflow: hidden; opacity: 0; }
+  .item.on .bar { opacity: 1; }
+  .item.on .bar i { display: block; height: 100%; width: 0; background: var(--grad); animation: fill var(--dur, 6s) linear forwards; }
+  .paused .item.on .bar i { animation-play-state: paused; }
+  @keyframes fill { to { width: 100%; } }
+
+  .stage { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(155deg, #2a1a5c 0%, #141230 42%, #2b0f2c 100%); }
+  .stage::before { content: ""; position: absolute; inset: 0; background: radial-gradient(55% 45% at 75% 85%, rgba(255,95,168,0.28), transparent 70%), radial-gradient(45% 40% at 15% 75%, rgba(79,227,255,0.18), transparent 70%); }
+  .windows { position: absolute; left: 7%; right: 7%; bottom: -6%; top: 26%; border-radius: 14px 14px 0 0; background: rgba(20,18,40,0.55); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(6px); }
+  .windows::before { content: ""; position: absolute; top: 12px; left: 14px; width: 50px; height: 10px; background: radial-gradient(circle at 5px 5px, #ff5f57 4.5px, transparent 5px), radial-gradient(circle at 23px 5px, #febc2e 4.5px, transparent 5px), radial-gradient(circle at 41px 5px, #28c840 4.5px, transparent 5px); }
+  .windows::after { content: ""; position: absolute; top: 44px; left: 24px; right: 40%; height: 9px; border-radius: 5px; background: rgba(255,255,255,0.07); box-shadow: 0 22px 0 rgba(255,255,255,0.05), 0 44px 0 rgba(255,255,255,0.05), 0 66px 0 rgba(255,255,255,0.04); }
+  .menubar { position: absolute; top: 0; left: 0; right: 0; height: 26px; background: rgba(0,0,0,0.3); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 0 14px; font-size: 11.5px; color: rgba(255,255,255,0.85); z-index: 2; }
+  .menubar b { font-weight: 700; margin-right: 12px; }
+
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 3; width: 150px; height: 26px; border-radius: 0 0 14px 14px; background: #000; overflow: hidden; transition: width .55s var(--ease), height .55s var(--ease), border-radius .55s var(--ease), box-shadow .5s; }
+  .notch.live { width: 250px; }
+  .notch.open { width: 66%; height: var(--h, 52%); border-radius: 0 0 30px 30px; box-shadow: 0 30px 90px rgba(0,0,0,0.6); background: rgba(8,7,16,0.92); backdrop-filter: blur(24px); }
+  .notch.open::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 1px solid rgba(255,255,255,0.08); border-top: 0; pointer-events: none; }
+  .mini { position: absolute; top: 0; left: 0; right: 0; height: 26px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; opacity: 0; transition: opacity .3s; }
+  .notch.live .mini { opacity: 1; }
+  .notch.open .mini { opacity: 0; }
+  .panel { position: absolute; inset: 34px 18px 16px; opacity: 0; transform: translateY(-8px) scale(.98); transition: opacity .35s .15s, transform .45s .15s var(--ease); }
+  .notch.open .panel { opacity: 1; transform: none; }
+  .tabs { position: absolute; top: 6px; left: 16px; display: flex; gap: 4px; opacity: 0; transition: opacity .3s .2s; }
+  .notch.open .tabs { opacity: 1; }
+  .tabs span { width: 20px; height: 16px; border-radius: 8px; display: grid; place-items: center; font-size: 9px; color: rgba(255,255,255,0.45); }
+  .tabs span.on { background: rgba(255,255,255,0.14); color: #fff; }
+
+  /* Panel building blocks */
+  .row { display: flex; gap: 14px; align-items: center; }
+  .art { border-radius: 12px; flex-shrink: 0; }
+  .t { font-weight: 700; font-size: clamp(11px, 1.5vw, 16px); line-height: 1.2; }
+  .s { color: var(--dim); font-size: clamp(9px, 1.1vw, 12px); }
+  .prog { height: 4px; border-radius: 4px; background: rgba(255,255,255,0.15); overflow: hidden; margin: 10px 0 8px; }
+  .prog i { display: block; height: 100%; width: 35%; background: var(--grad); animation: grow 8s linear infinite; }
+  @keyframes grow { from { width: 25%; } to { width: 75%; } }
+  .ctrls { display: flex; align-items: center; justify-content: space-between; font-size: clamp(10px, 1.4vw, 15px); color: rgba(255,255,255,0.85); max-width: 230px; }
+  .play { width: clamp(22px, 3vw, 32px); aspect-ratio: 1; border-radius: 50%; background: #fff; color: #000; display: grid; place-items: center; font-size: clamp(8px, 1vw, 11px); }
+  .eq { display: flex; gap: 2px; align-items: flex-end; height: 13px; }
+  .eq i { width: 3px; border-radius: 2px; animation: eq .9s ease-in-out infinite; background: var(--pink); }
   .eq i:nth-child(2) { animation-delay: .2s; background: var(--violet); } .eq i:nth-child(3) { animation-delay: .4s; background: var(--cyan); } .eq i:nth-child(4) { animation-delay: .1s; }
-  @keyframes eq { 0%, 100% { height: 4px; } 50% { height: 14px; } }
-  .panel { position: absolute; inset: 40px 22px 18px; display: flex; gap: 20px; align-items: center; opacity: 0; animation: panel 9s infinite; }
-  @keyframes panel { 0%, 40% { opacity: 0; transform: translateY(-6px); } 46%, 76% { opacity: 1; transform: none; } 80%, 100% { opacity: 0; } }
-  .panel .big { width: 34%; aspect-ratio: 1; border-radius: 14px; background: linear-gradient(135deg, var(--pink), var(--violet) 55%, var(--cyan)); box-shadow: 0 10px 40px rgba(255,95,168,0.35); flex-shrink: 0; }
-  .panel .info { flex: 1; text-align: left; }
-  .panel .t { font-weight: 700; font-size: clamp(12px, 1.8vw, 18px); }
-  .panel .a { color: var(--dim); font-size: clamp(10px, 1.3vw, 13px); }
-  .bar { height: 4px; border-radius: 4px; background: rgba(255,255,255,0.15); margin: 12px 0 10px; overflow: hidden; }
-  .bar i { display: block; height: 100%; width: 40%; background: var(--grad); animation: prog 9s linear infinite; }
-  @keyframes prog { from { width: 30%; } to { width: 70%; } }
-  .ctrls { display: flex; gap: 14px; align-items: center; font-size: clamp(12px, 1.6vw, 16px); }
-  .ctrls .play { width: clamp(24px, 3.4vw, 34px); aspect-ratio: 1; border-radius: 50%; background: #fff; color: #000; display: grid; place-items: center; font-size: 11px; }
+  @keyframes eq { 0%, 100% { height: 3px; } 50% { height: 13px; } }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: clamp(8px, 1vw, 11px); padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); }
+  .lyr { font-weight: 800; font-size: clamp(12px, 1.9vw, 20px); line-height: 1.5; }
+  .lyr div { color: rgba(255,255,255,0.3); transition: color .4s; }
+  .lyr div.cur { color: #fff; }
+  .lyr-scroll { animation: lyr 6s steps(1) infinite; }
+  .tiles { display: flex; gap: 10px; }
+  .tile { flex: 1; border-radius: 12px; background: rgba(255,255,255,0.06); padding: 10px 6px; text-align: center; font-size: clamp(8px, 1vw, 11px); color: var(--dim); }
+  .tile .f { height: clamp(26px, 4vw, 44px); width: 70%; margin: 0 auto 6px; border-radius: 6px; }
+  .drop { border: 1.5px dashed rgba(255,255,255,0.25); border-radius: 14px; padding: 8px; text-align: center; color: var(--dim); font-size: clamp(9px, 1.1vw, 12px); margin-top: 10px; }
+  .file-fly { position: absolute; width: 34px; height: 42px; border-radius: 6px; background: linear-gradient(160deg, #fff, #dcd6ff); box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 4; left: 72%; top: 70%; opacity: 0; }
+  .file-fly.go { animation: fly 1.4s cubic-bezier(.6,0,.3,1) forwards; }
+  @keyframes fly { 0% { opacity: 0; transform: translate(0,0) rotate(8deg); } 15% { opacity: 1; } 80% { opacity: 1; transform: translate(-22vw, -27vw) rotate(-4deg) scale(.7); } 100% { opacity: 0; transform: translate(-22vw, -28vw) scale(.4); } }
+  .ev { display: flex; gap: 10px; align-items: center; padding: 7px 8px; border-radius: 10px; }
+  .ev.next { background: rgba(255,255,255,0.07); }
+  .ev .c { width: 3px; height: clamp(18px, 3vw, 30px); border-radius: 2px; }
+  .join { margin-left: auto; font-size: clamp(8px, 1vw, 11px); font-weight: 700; background: var(--green); color: #000; padding: 4px 10px; border-radius: 999px; }
+  .ring { width: clamp(70px, 11vw, 120px); aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--orange) calc(var(--p) * 1%), rgba(255,255,255,0.12) 0); display: grid; place-items: center; animation: ringp 6s linear infinite; }
+  .ring::before { content: attr(data-t); width: 82%; aspect-ratio: 1; border-radius: 50%; background: #0b0a14; display: grid; place-items: center; font-weight: 700; font-size: clamp(12px, 2vw, 22px); font-variant-numeric: tabular-nums; }
+  @property --p { syntax: '<number>'; inherits: false; initial-value: 20; }
+  @keyframes ringp { from { --p: 20; } to { --p: 60; } }
+  .code { font: clamp(8px, 1.05vw, 12px)/1.5 ui-monospace, Menlo, monospace; background: rgba(255,255,255,0.07); border-radius: 10px; padding: 10px; color: rgba(255,255,255,0.9); margin: 10px 0; }
+  .btns { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+  .b1, .b2 { font-size: clamp(8px, 1vw, 12px); font-weight: 700; padding: 5px 14px; border-radius: 999px; }
+  .b1 { border: 1px solid rgba(255,255,255,0.35); } .b2 { background: #fff; color: #000; }
+  .cursor { position: absolute; width: 16px; height: 16px; z-index: 5; left: 50%; top: 85%; opacity: 0; transition: left 1s cubic-bezier(.5,0,.2,1), top 1s cubic-bezier(.5,0,.2,1), opacity .3s; }
+  .cursor svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
 
-  section { padding: 110px 0 0; }
-  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  h2 { font-size: clamp(30px, 4.4vw, 48px); letter-spacing: -0.03em; line-height: 1.1; margin: 10px 0 14px; font-weight: 800; }
-  .lead { color: var(--dim); max-width: 600px; font-size: 18px; }
+  /* ---------- Sections ---------- */
+  section { padding: 130px 0 0; }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  h2 { font-size: clamp(32px, 4.6vw, 54px); letter-spacing: -0.035em; line-height: 1.05; margin: 12px 0 14px; font-weight: 800; }
+  .lead { color: var(--dim); max-width: 620px; font-size: 18px; }
+  .center { text-align: center; } .center .lead { margin: 0 auto; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 44px; }
-  .card { border: 1px solid var(--line); background: var(--card); border-radius: 22px; padding: 26px; transition: transform .2s ease, border-color .2s ease; position: relative; overflow: hidden; }
-  .card:hover { transform: translateY(-4px); border-color: rgba(139,108,255,0.45); }
-  .card .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; margin-bottom: 16px; }
-  .card h3 { font-size: 19px; letter-spacing: -0.01em; margin-bottom: 6px; }
-  .card p { color: var(--dim); font-size: 15px; }
-  .c1 .ic { background: rgba(255,95,168,0.16); } .c2 .ic { background: rgba(79,227,255,0.14); } .c3 .ic { background: rgba(255,90,90,0.15); }
-  .c4 .ic { background: rgba(255,170,60,0.15); } .c5 .ic { background: rgba(139,108,255,0.18); } .c6 .ic { background: rgba(80,220,140,0.15); }
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 48px; }
+  .bx { border: 1px solid var(--line); background: var(--card); border-radius: 24px; padding: 26px; position: relative; overflow: hidden; transition: transform .3s var(--ease), border-color .3s; min-height: 220px; }
+  .bx:hover { transform: translateY(-4px); border-color: rgba(139,108,255,0.4); }
+  .bx h3 { font-size: 20px; letter-spacing: -0.01em; margin: 10px 0 6px; }
+  .bx p { color: var(--dim); font-size: 15px; max-width: 420px; }
+  .bx .tag { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .w2 { grid-column: span 2; } .w3 { grid-column: span 3; } .w4 { grid-column: span 4; }
+  .bx .glow { position: absolute; width: 260px; height: 260px; border-radius: 50%; filter: blur(70px); opacity: .35; right: -60px; bottom: -80px; }
+  .vis { margin-top: 18px; }
+  .mini-notch { width: 160px; height: 30px; border-radius: 0 0 14px 14px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; border: 1px solid var(--line); border-top: 0; }
 
-  .split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 50px; align-items: center; }
+  .logos { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 34px; }
+  .logos span { border: 1px solid var(--line); background: var(--card); padding: 10px 18px; border-radius: 999px; color: var(--dim); font-weight: 600; font-size: 14px; }
+
+  .split { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }
   .list { list-style: none; margin-top: 24px; display: grid; gap: 12px; }
   .list li { display: flex; gap: 12px; color: var(--dim); }
   .list li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; margin-top: 9px; background: var(--grad); flex-shrink: 0; }
-  .mock { border: 1px solid var(--line); background: var(--card); border-radius: 22px; padding: 22px; }
-  .row { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; }
-  .row + .row { border-top: 1px solid var(--line); }
-  .row .sw { margin-left: auto; width: 38px; height: 22px; border-radius: 999px; background: var(--violet); position: relative; }
-  .row .sw::after { content: ""; position: absolute; right: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; }
-  .row .sw.off { background: rgba(255,255,255,0.15); } .row .sw.off::after { right: auto; left: 3px; }
-  .row .grip { color: var(--dim); }
+  .settings { border: 1px solid var(--line); background: var(--card); border-radius: 24px; padding: 18px; }
+  .srow { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; font-weight: 500; }
+  .srow + .srow { border-top: 1px solid var(--line); }
+  .srow .g { color: var(--faint); cursor: grab; }
+  .sw { margin-left: auto; width: 40px; height: 24px; border-radius: 999px; background: var(--violet); position: relative; cursor: pointer; transition: background .2s; }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 19px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .25s var(--ease); }
+  .sw.off { background: rgba(255,255,255,0.15); } .sw.off::after { left: 3px; }
 
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 40px; }
-  .step { border: 1px solid var(--line); border-radius: 20px; padding: 22px; background: var(--card); }
-  .step b { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--grad); color: #000; font-size: 14px; margin-bottom: 12px; }
-  .step p { color: var(--dim); font-size: 15px; }
-  code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 6px; }
+  .privacy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 44px; }
+  .pv { border: 1px solid var(--line); border-radius: 20px; padding: 22px; background: var(--card); }
+  .pv b { display: block; font-size: 17px; margin-bottom: 6px; }
+  .pv p { color: var(--dim); font-size: 15px; }
 
-  .final { text-align: center; padding: 120px 0 90px; }
-  .final img { width: 120px; height: 120px; filter: drop-shadow(0 20px 50px rgba(139,108,255,0.45)); }
-  footer { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--dim); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .faq { max-width: 760px; margin: 44px auto 0; }
+  details { border-bottom: 1px solid var(--line); padding: 18px 4px; }
+  summary { cursor: pointer; font-weight: 600; font-size: 17px; list-style: none; display: flex; justify-content: space-between; }
+  summary::after { content: "+"; color: var(--faint); font-size: 22px; line-height: 1; transition: transform .25s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { color: var(--dim); margin-top: 10px; }
+  code { font: 13px ui-monospace, Menlo, monospace; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 6px; }
 
-  @media (max-width: 820px) { .split { grid-template-columns: 1fr; } .nav-links { display: none; } }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .panel { opacity: 1; } .notch { width: 62%; height: 46%; } }
+  .final { text-align: center; padding: 140px 0 100px; }
+  .final img { width: 128px; height: 128px; filter: drop-shadow(0 24px 60px rgba(139,108,255,0.5)); animation: bob 5s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-10px); } }
+  footer { border-top: 1px solid var(--line); padding: 26px 0 44px; color: var(--faint); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .showcase { grid-template-columns: 1fr; }
+    .side { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    .side h4, .item small { display: none; }
+    .item { flex-shrink: 0; }
+    .bento { grid-template-columns: 1fr; } .w2, .w3, .w4 { grid-column: auto; }
+    .split, .privacy { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<div class="glow"></div>
-<div class="wrap">
-  <nav>
-    <a class="brand" href="#"><img src="logo.png" alt="">Drift</a>
-    <div class="nav-links">
-      <a href="#features">Features</a>
-      <a href="#yours">Customize</a>
-      <a href="#install">Install</a>
-      <a href="https://github.com/faatehsultan/drift">GitHub</a>
-    </div>
-  </nav>
+<div class="aurora"></div><div class="noise"></div>
 
+<nav id="nav"><div class="wrap">
+  <a class="brand" href="#"><img src="logo.png" alt="">Drift</a>
+  <div class="nav-links">
+    <a href="#features">Features</a><a href="#yours">Customize</a><a href="#privacy">Privacy</a><a href="#faq">FAQ</a><a href="https://github.com/faatehsultan/drift">GitHub</a>
+  </div>
+  <a class="nav-cta" data-download href="#">Download</a>
+</div></nav>
+
+<div class="wrap">
   <header class="hero">
-    <span class="pill"><b>Free</b> · for every Mac, notch or not</span>
-    <h1>Your notch,<br><span>finally useful.</span></h1>
-    <p class="sub">Drift turns the MacBook notch into a living control center. Music with synced lyrics, a file tray, your next meeting, timers and more, one hover away.</p>
+    <span class="pill"><span class="dot"></span>Free and open source · works on every Mac, notch or not</span>
+    <h1>Your notch,<br><span class="grad">finally useful.</span></h1>
+    <p class="sub">Drift turns the MacBook notch into a living control center. Music and lyrics, media from any app, a file tray, your next meeting, focus timers and AI approvals, one hover away.</p>
     <div class="cta">
-      <a class="btn primary" href="https://github.com/faatehsultan/drift/releases/latest/download/Drift.dmg">
+      <a class="btn primary" data-download href="#">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.62c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.27-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.78.74 2.99.72 1.24-.02 2.02-1.12 2.77-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.65zM14.1 5.9c.63-.77 1.06-1.83.94-2.9-.91.04-2.02.61-2.67 1.37-.58.67-1.1 1.76-.96 2.8 1.02.08 2.06-.52 2.69-1.27z"/></svg>
         Download for macOS
       </a>
-      <a class="btn ghost" href="#features">See what it does</a>
+      <a class="btn ghost" href="https://github.com/faatehsultan/drift"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>Star on GitHub</a>
     </div>
     <p class="meta">macOS 13 or later · Apple silicon · updates itself</p>
 
-    <div class="stage" aria-hidden="true">
-      <div class="menubar"><span>&nbsp;File&nbsp;&nbsp;Edit&nbsp;&nbsp;View</span><span>Thu 9:41</span></div>
-      <div class="notch">
-        <div class="mini"><span class="art"></span><span class="eq"><i></i><i></i><i></i><i></i></span></div>
-        <div class="panel">
-          <div class="big"></div>
-          <div class="info">
-            <div class="t">Midnight Drive</div>
-            <div class="a">Neon Coast · Afterglow</div>
-            <div class="bar"><i></i></div>
-            <div class="ctrls"><span>⇄</span><span>⏮</span><span class="play">❚❚</span><span>⏭</span><span>↻</span></div>
-          </div>
+    <div class="showcase reveal" id="showcase">
+      <div class="side" id="side"><h4>What it can do</h4></div>
+      <div class="stage" id="stage">
+        <div class="menubar"><span><b></b>File&nbsp;&nbsp;Edit&nbsp;&nbsp;View&nbsp;&nbsp;Window</span><span id="clock">Thu 9:41</span></div>
+        <div class="windows"></div>
+        <div class="notch" id="notch">
+          <div class="mini" id="mini"></div>
+          <div class="tabs" id="tabs"></div>
+          <div class="panel" id="panel"></div>
         </div>
+        <div class="file-fly" id="fly"></div>
+        <div class="cursor" id="cursor"><svg width="16" height="20" viewBox="0 0 16 20"><path d="M1 1l13 10.5-6 .7 3.4 6.6-2.4 1.2-3.4-6.6L1 17z" fill="#fff" stroke="#000" stroke-width="1"/></svg></div>
       </div>
     </div>
   </header>
 
-  <section id="features">
-    <div class="eyebrow">Everything, one hover away</div>
-    <h2>A whole toolkit hiding<br>in plain sight.</h2>
-    <p class="lead">Move your pointer to the top of the screen and Drift springs open. Move away and it tucks itself back into the notch.</p>
-    <div class="grid">
-      <div class="card c1"><div class="ic">🎵</div><h3>Music, with real lyrics</h3><p>Search, play, queue and browse YouTube Music natively. Synced lyrics scroll with the song; tap a line to jump to it.</p></div>
-      <div class="card c2"><div class="ic">📥</div><h3>Drop files on the notch</h3><p>Drag anything to the top of your screen to park it. AirDrop it, merge PDFs, or convert images, video and docs in a click.</p></div>
-      <div class="card c3"><div class="ic">📅</div><h3>Never miss a meeting</h3><p>Your next event and a live countdown, with one-click Join for Zoom, Meet, Teams and Webex.</p></div>
-      <div class="card c4"><div class="ic">⏱️</div><h3>Focus and get stuff done</h3><p>Timers and Pomodoro that count down in the notch, quick notes, to-dos, your Shortcuts and a camera mirror.</p></div>
-      <div class="card c5"><div class="ic">✨</div><h3>Live activities</h3><p>Now playing, timers, meetings, charging and new files show up right in the notch, like the Dynamic Island.</p></div>
-      <div class="card c6"><div class="ic">🤖</div><h3>Approve your AI agent</h3><p>Claude Code asks for permission in the notch. Allow or deny without leaving what you're doing.</p></div>
+  <section id="features" class="reveal">
+    <div class="center">
+      <div class="eyebrow grad">Everything, one hover away</div>
+      <h2>A whole toolkit hiding<br>in plain sight.</h2>
+      <p class="lead">Point at the top of your screen and Drift springs open. Move away and it melts back into the notch.</p>
     </div>
+    <div class="bento">
+      <div class="bx w4"><span class="tag" style="color:var(--pink)">Music</span><h3>A real player, not a web page in a box</h3><p>Search YouTube Music, browse albums and artists, edit your queue, like songs and watch synced lyrics scroll with the beat. The colors follow the album art.</p><div class="glow" style="background:var(--pink)"></div></div>
+      <div class="bx w2"><span class="tag" style="color:var(--cyan)">Any app</span><h3>Plays nice with your browser</h3><p>Music or video in Chrome, Safari, Arc or Spotify shows up too, with play, pause, skip and seek.</p><div class="glow" style="background:var(--cyan)"></div></div>
+      <div class="bx w2"><span class="tag" style="color:#60a5fa">Tray</span><h3>Drop files on the notch</h3><p>Park files, AirDrop them, merge PDFs, or convert images, video and docs in a click.</p><div class="glow" style="background:#60a5fa"></div></div>
+      <div class="bx w2"><span class="tag" style="color:var(--red)">Calendar</span><h3>Never late again</h3><p>Your next meeting, a live countdown and a Join button for Zoom, Meet, Teams and Webex.</p><div class="glow" style="background:var(--red)"></div></div>
+      <div class="bx w2"><span class="tag" style="color:var(--orange)">Focus</span><h3>Timers that live in the notch</h3><p>Timers and Pomodoro count down right beside the camera. Plus notes, to-dos, Shortcuts, clipboard history and a mirror.</p><div class="glow" style="background:var(--orange)"></div></div>
+      <div class="bx w3"><span class="tag" style="color:var(--violet)">AI agents</span><h3>Approve Claude Code from the notch</h3><p>When your coding agent needs permission, the notch opens with the exact command. Allow or deny without leaving what you're doing.</p><div class="vis"><div class="mini-notch"><span style="color:var(--orange)">✦</span><span class="eq"><i style="background:var(--orange)"></i></span></div></div><div class="glow" style="background:var(--violet)"></div></div>
+      <div class="bx w3"><span class="tag" style="color:var(--green)">Live activities</span><h3>Like the Dynamic Island, but for Mac</h3><p>Now playing, timers, meetings, charging and new files show around the camera, and a little pull-down greets every change.</p><div class="vis"><div class="mini-notch"><span style="width:16px;height:16px;border-radius:4px;background:var(--grad)"></span><span class="eq"><i></i><i></i><i></i><i></i></span></div></div><div class="glow" style="background:var(--green)"></div></div>
+    </div>
+    <div class="logos"><span>YouTube Music</span><span>Chrome</span><span>Safari</span><span>Arc</span><span>Spotify</span><span>Apple Music</span><span>Zoom</span><span>Google Meet</span><span>Teams</span><span>Claude Code</span><span>Shortcuts</span><span>AirDrop</span></div>
   </section>
 
-  <section id="yours">
+  <section id="yours" class="reveal">
     <div class="split">
       <div>
-        <div class="eyebrow">Make it yours</div>
-        <h2>Show what you love.<br>Hide what you don't.</h2>
-        <p class="lead">Every section, widget, tool and live activity can be turned on, off or reordered.</p>
+        <div class="eyebrow grad">Make it yours</div>
+        <h2>Show what you love.<br>Hide the rest.</h2>
+        <p class="lead">Every section, widget, tool and live activity can be switched on, off or reordered. Go glassy or pure black.</p>
         <ul class="list">
-          <li>Liquid Glass or solid black</li>
-          <li>Drag to reorder sections, widgets and tools</li>
-          <li>Global hotkeys for everything</li>
-          <li>Works on Macs without a notch too</li>
+          <li>Liquid Glass on macOS 26, frosted glass before that</li>
+          <li>Drag to reorder sections, home widgets and tools</li>
+          <li>Global hotkeys: ⌥ Space opens it from anywhere</li>
+          <li>On Macs without a notch, a sleek pill takes its place</li>
         </ul>
       </div>
-      <div class="mock">
-        <div class="row"><span class="grip">☰</span> Home <span class="sw"></span></div>
-        <div class="row"><span class="grip">☰</span> Music <span class="sw"></span></div>
-        <div class="row"><span class="grip">☰</span> Tray <span class="sw"></span></div>
-        <div class="row"><span class="grip">☰</span> Calendar <span class="sw"></span></div>
-        <div class="row"><span class="grip">☰</span> Tools <span class="sw off"></span></div>
+      <div class="settings" id="settings">
+        <div class="srow"><span class="g">☰</span>🏠 Home<span class="sw"></span></div>
+        <div class="srow"><span class="g">☰</span>🎵 Music<span class="sw"></span></div>
+        <div class="srow"><span class="g">☰</span>📥 Tray<span class="sw"></span></div>
+        <div class="srow"><span class="g">☰</span>📅 Calendar<span class="sw"></span></div>
+        <div class="srow"><span class="g">☰</span>🧰 Tools<span class="sw off"></span></div>
       </div>
     </div>
   </section>
 
-  <section id="install">
-    <div class="eyebrow">Install</div>
-    <h2>Up and running in a minute.</h2>
-    <div class="steps">
-      <div class="step"><b>1</b><h3>Download</h3><p>Grab <code>Drift.dmg</code> and drag Drift into Applications.</p></div>
-      <div class="step"><b>2</b><h3>Open it</h3><p>The first time, macOS may block it. Open <b style="all:unset;color:var(--text)">System Settings → Privacy &amp; Security</b> and click <b style="all:unset;color:var(--text)">Open Anyway</b>.</p></div>
-      <div class="step"><b>3</b><h3>Hover the notch</h3><p>That's it. Drift updates itself whenever a new version ships.</p></div>
+  <section id="privacy" class="reveal">
+    <div class="center">
+      <div class="eyebrow grad">Private by design</div>
+      <h2>Your stuff stays on your Mac.</h2>
+      <p class="lead">No account, no tracking, no analytics.</p>
+    </div>
+    <div class="privacy">
+      <div class="pv"><b>Local first</b><p>Notes, to-dos, clipboard history and your tray live on your Mac only.</p></div>
+      <div class="pv"><b>You hold the keys</b><p>Calendar and camera are off until you allow them, and password managers' copies are never recorded.</p></div>
+      <div class="pv"><b>Talks only where needed</b><p>Music comes from YouTube Music, and lyrics are looked up by song name. The Claude Code bridge only listens on your own Mac.</p></div>
     </div>
   </section>
 
-  <div class="final">
+  <section id="faq" class="reveal">
+    <div class="center"><div class="eyebrow grad">FAQ</div><h2>Questions, answered.</h2></div>
+    <div class="faq">
+      <details><summary>Is it really free?</summary><p>Yes, and open source under the GPL-3.0. Use everything, read the code, or help build it on <a href="https://github.com/faatehsultan/drift" style="text-decoration:underline">GitHub</a>.</p></details>
+      <details><summary>Does it need a Mac with a notch?</summary><p>No. On other Macs and external displays, Drift draws a slim black pill at the top center that works the same way.</p></details>
+      <details><summary>macOS says it can't open Drift. What do I do?</summary><p>Open System Settings → Privacy &amp; Security, scroll down and click Open Anyway. You only need to do this once.</p></details>
+      <details><summary>Do I need a YouTube Music account?</summary><p>No. Search and playback work without one. Sign in to see your likes, playlists and mixes.</p></details>
+      <details><summary>How do updates work?</summary><p>Drift checks once a day and offers new versions with release notes. You can also use Check for Updates… in the menu.</p></details>
+      <details><summary>How do Claude Code approvals work?</summary><p>In Settings → Integrations, click Install hook. Permission requests then show in the notch. If Drift isn't running, Claude Code asks in the terminal as usual.</p></details>
+    </div>
+  </section>
+
+  <div class="final reveal">
     <img src="logo.png" alt="Drift app icon">
     <h2>Give your notch a job.</h2>
-    <div class="cta"><a class="btn primary" href="https://github.com/faatehsultan/drift/releases/latest/download/Drift.dmg">Download Drift, it's free</a></div>
+    <div class="cta"><a class="btn primary" data-download href="#">Download Drift, it's free</a></div>
+    <p class="meta">macOS 13 or later · Apple silicon</p>
   </div>
 
-  <footer>
-    <span>Made by Faateh Sultan</span>
-    <span><a href="https://github.com/faatehsultan/drift">GitHub</a> · <a href="https://github.com/faatehsultan/drift/releases">Release notes</a></span>
-  </footer>
+  <footer><span>Drift is open source (GPL-3.0) · made by Faateh Sultan · <a href="https://github.com/faatehsultan/drift" style="text-decoration:underline">GitHub</a></span><span>Not affiliated with Apple, Google or Anthropic.</span></footer>
 </div>
+
+<script>
+// One place to change where the Download buttons point.
+const DOWNLOAD_URL = "https://github.com/faatehsultan/drift/releases/latest/download/Drift.dmg";
+document.querySelectorAll("[data-download]").forEach(a => a.href = DOWNLOAD_URL);
+
+const art = (a, b, s = 54) => `<div class="art" style="width:${s}%;max-width:150px;aspect-ratio:1;background:linear-gradient(135deg,${a},${b})"></div>`;
+const eq = c => `<span class="eq">${[0,1,2,3].map(() => `<i${c ? ` style="background:${c}"` : ""}></i>`).join("")}</span>`;
+const sq = (c) => `<span style="width:16px;height:16px;border-radius:4px;background:${c}"></span>`;
+
+const scenes = [
+  { id: "music", h: "42%", icon: "🎵", name: "Music", desc: "Search, queue, likes", tab: 1,
+    mini: sq("linear-gradient(135deg,#ff5fa8,#8b6cff)") + eq(),
+    panel: `<div class="row">${art("#ff5fa8","#8b6cff",34)}<div style="flex:1"><div class="t">Midnight Drive</div><div class="s">Neon Coast · Afterglow</div><div class="prog"><i></i></div><div class="ctrls"><span>⇄</span><span>⏮</span><span class="play">❚❚</span><span>⏭</span><span>♡</span></div></div></div>` },
+  { id: "lyrics", h: "52%", icon: "💬", name: "Synced lyrics", desc: "Scrolls with the beat", tab: 1,
+    mini: sq("linear-gradient(135deg,#4fe3ff,#8b6cff)") + eq(),
+    panel: `<div class="lyr" id="lyr"><div>City lights are fading out</div><div>We're driving through the night</div><div>Hold on, don't let go</div><div>We're chasing every light</div><div>Til the morning comes</div></div>` },
+  { id: "anyapp", h: "46%", icon: "🌐", name: "Any app", desc: "Chrome, Safari, Spotify", tab: 1,
+    mini: sq("linear-gradient(135deg,#ffa94d,#ff6b6b)") + eq("#ffa94d"),
+    panel: `<div class="row">${art("#ffa94d","#ff6b6b",34)}<div style="flex:1"><div class="t">Lo-fi beats to code to</div><div class="s">Chillhop Radio</div><div style="margin-top:6px"><span class="chip">🌐 Playing in Google Chrome</span></div><div class="prog"><i></i></div><div class="ctrls" style="max-width:150px"><span>⏮</span><span class="play">❚❚</span><span>⏭</span></div></div></div>` },
+  { id: "tray", h: "50%", icon: "📥", name: "File tray", desc: "Drop, AirDrop, convert", tab: 2,
+    mini: `<span style="color:#60a5fa">📥</span><span class="s" style="color:#fff">3</span>`,
+    panel: `<div style="display:flex;gap:6px;margin-bottom:10px"><span class="chip" style="background:#fff;color:#000">Shelf · 3</span><span class="chip">Pocket · 1</span><span class="chip" style="margin-left:auto">✈︎ AirDrop</span><span class="chip">Merge PDFs</span></div><div class="tiles"><div class="tile"><div class="f" style="background:linear-gradient(135deg,#4fe3ff,#8b6cff)"></div>design.png</div><div class="tile"><div class="f" style="background:#ff6b6b"></div>invoice.pdf</div><div class="tile"><div class="f" style="background:#4ade80"></div>notes.docx</div><div class="tile"><div class="f" style="background:#ffa94d"></div>demo.mov</div></div><div class="drop">Convert to PNG · JPEG · PDF · MP4 · text</div>`, fly: true },
+  { id: "calendar", h: "56%", icon: "📅", name: "Calendar", desc: "Countdown and Join", tab: 3,
+    mini: `<span style="color:#ff6b6b">📅</span><span class="s" style="color:#fff;font-weight:700">in 4m</span>`,
+    panel: `<div class="s" style="margin-bottom:6px">Today</div><div class="ev next"><span class="c" style="background:#ff6b6b"></span><div><div class="t" style="font-size:clamp(10px,1.3vw,14px)">Design review</div><div class="s">10:30 – 11:00 · in 4m</div></div><span class="join">▶ Join Zoom</span></div><div class="ev"><span class="c" style="background:#8b6cff"></span><div><div class="t" style="font-size:clamp(10px,1.3vw,14px)">1:1 with Sara</div><div class="s">13:00 – 13:30</div></div><span class="join" style="background:#fff">▶ Join Meet</span></div><div class="ev"><span class="c" style="background:#4fe3ff"></span><div><div class="t" style="font-size:clamp(10px,1.3vw,14px)">Team standup</div><div class="s">Tomorrow 9:30</div></div></div>` },
+  { id: "focus", h: "48%", icon: "⏱️", name: "Focus timer", desc: "Pomodoro in the notch", tab: 4,
+    mini: `<span style="width:14px;height:14px;border-radius:50%;border:2.5px solid #ffa94d;border-right-color:rgba(255,255,255,.2)"></span><span class="s" style="color:#fff;font-weight:700;font-variant-numeric:tabular-nums">18:42</span>`,
+    panel: `<div class="row" style="gap:22px"><div class="ring" data-t="18:42"></div><div><div style="display:flex;gap:6px"><span class="chip">Timer</span><span class="chip" style="background:#fff;color:#000">Pomodoro</span></div><div class="t" style="margin-top:10px">Focus · 25 min</div><div class="s">2 sessions done today</div><div style="margin-top:10px;display:flex;gap:6px"><span class="b2">❚❚ Pause</span><span class="b1">Reset</span></div></div></div>` },
+  { id: "agent", h: "44%", icon: "✨", name: "AI approvals", desc: "Allow Claude Code", tab: 0,
+    mini: `<span style="color:#ffa94d">✦</span><span style="width:8px;height:8px;border-radius:50%;background:#ffa94d;box-shadow:0 0 10px #ffa94d"></span>`,
+    panel: `<div class="row" style="gap:10px"><span style="width:26px;height:26px;border-radius:50%;background:rgba(255,169,77,.2);display:grid;place-items:center;color:#ffa94d">✦</span><div><div class="t" style="font-size:clamp(10px,1.4vw,15px)">Claude Code wants to use Bash</div><div class="s">drift</div></div></div><div class="code">npm run test -- --coverage</div><div class="btns"><span class="s" style="margin-right:auto">Ask in terminal</span><span class="b1">Deny</span><span class="b2">✓ Allow</span></div>` },
+];
+
+const side = document.getElementById("side");
+const notch = document.getElementById("notch");
+const mini = document.getElementById("mini");
+const panel = document.getElementById("panel");
+const tabs = document.getElementById("tabs");
+const fly = document.getElementById("fly");
+const cursor = document.getElementById("cursor");
+const showcase = document.getElementById("showcase");
+const DUR = 6000;
+let current = -1, timer = null, steps = [], paused = false, lyrTimer = null;
+
+scenes.forEach((s, i) => {
+  const el = document.createElement("div");
+  el.className = "item";
+  el.innerHTML = `<span class="ic">${s.icon}</span><span>${s.name}<small>${s.desc}</small></span><span class="bar"><i></i></span>`;
+  el.addEventListener("mouseenter", () => { paused = true; showcase.classList.add("paused"); show(i, true); });
+  el.addEventListener("click", () => show(i, true));
+  side.appendChild(el);
+});
+side.addEventListener("mouseleave", () => { paused = false; showcase.classList.remove("paused"); schedule(); });
+
+function clearSteps() { steps.forEach(clearTimeout); steps = []; clearInterval(lyrTimer); }
+function later(ms, fn) { steps.push(setTimeout(fn, ms)); }
+
+function show(i, fromUser) {
+  if (i === current && fromUser) return;
+  current = i;
+  clearSteps();
+  clearTimeout(timer);
+  const s = scenes[i];
+  [...side.querySelectorAll(".item")].forEach((el, j) => {
+    el.classList.toggle("on", j === i);
+    const bar = el.querySelector(".bar i");
+    bar.style.animation = "none"; void bar.offsetWidth; bar.style.animation = "";
+  });
+  showcase.style.setProperty("--dur", DUR + "ms");
+
+  // collapse → live activity → cursor hovers → expand
+  notch.className = "notch";
+  cursor.style.opacity = 0; cursor.style.left = "62%"; cursor.style.top = "80%";
+  later(250, () => { mini.innerHTML = s.mini; notch.classList.add("live"); });
+  if (s.fly) later(300, () => { fly.classList.remove("go"); void fly.offsetWidth; fly.classList.add("go"); });
+  later(1100, () => { cursor.style.opacity = 1; cursor.style.left = "51%"; cursor.style.top = "4%"; });
+  later(1900, () => {
+    tabs.innerHTML = ["✦","♪","📥","📅","⏱"].map((t, k) => `<span class="${k === s.tab ? "on" : ""}">${t}</span>`).join("");
+    panel.innerHTML = s.panel;
+    notch.style.setProperty("--h", s.h);
+    notch.classList.add("open");
+    cursor.style.opacity = 0;
+    if (s.id === "lyrics") animateLyrics();
+  });
+  if (!paused) schedule();
+}
+
+function schedule() {
+  clearTimeout(timer);
+  if (paused) return;
+  timer = setTimeout(() => show((current + 1) % scenes.length), DUR);
+}
+
+function animateLyrics() {
+  const lines = [...document.querySelectorAll("#lyr div")];
+  let k = 0;
+  const step = () => { lines.forEach((l, j) => l.classList.toggle("cur", j === k)); k = (k + 1) % lines.length; };
+  step();
+  lyrTimer = setInterval(step, 900);
+}
+
+// Start when visible
+new IntersectionObserver((es, obs) => {
+  if (es[0].isIntersecting) { show(0); obs.disconnect(); }
+}, { threshold: 0.3 }).observe(showcase);
+
+// Scroll reveal and nav border
+const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("in")), { threshold: 0.12 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+addEventListener("scroll", () => document.getElementById("nav").classList.toggle("scrolled", scrollY > 10));
+
+// Toggles in the customize mock actually toggle
+document.querySelectorAll("#settings .sw").forEach(sw => sw.addEventListener("click", () => sw.classList.toggle("off")));
+
+// Live clock in the fake menu bar
+const fmt = () => new Date().toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });
+document.getElementById("clock").textContent = fmt();
+setInterval(() => document.getElementById("clock").textContent = fmt(), 30000);
+</script>
 </body>
 </html>
