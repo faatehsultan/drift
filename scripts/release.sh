@@ -12,11 +12,11 @@ TOOLS=.tools/sparkle
 command -v gh >/dev/null || { echo "Install the GitHub CLI first: brew install gh && gh auth login" >&2; exit 1; }
 [ -z "$(git status --porcelain)" ] || { echo "Commit or stash your changes first" >&2; exit 1; }
 
-scripts/bump.sh "${1:-patch}"
+bash scripts/bump.sh "${1:-patch}"
 V="$(cat VERSION)"
 B="$(cat BUILD_NUMBER)"
 
-./build.sh
+bash ./build.sh
 
 mkdir -p dist
 ZIP="dist/Drift-$V.zip"
