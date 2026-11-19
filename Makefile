@@ -1,4 +1,4 @@
-.PHONY: build run patch minor major release release-minor release-major setup-updates
+.PHONY: dmg build run patch minor major release release-minor release-major setup-updates
 
 # Scripts are run through bash so they work even if the executable bit gets lost.
 build:          ; bash ./build.sh
@@ -10,3 +10,4 @@ release:        ; bash scripts/release.sh patch
 release-minor:  ; bash scripts/release.sh minor
 release-major:  ; bash scripts/release.sh major
 setup-updates:  ; bash scripts/setup-sparkle.sh
+dmg:            ; bash ./build.sh && mkdir -p dist && bash scripts/make-dmg.sh build/Drift.app dist/Drift.dmg

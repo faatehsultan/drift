@@ -49,11 +49,19 @@ Works on Macs without a notch too: a slim pill takes its place.
 
 ## Install
 
-1. Download **[Drift.dmg](https://github.com/faatehsultan/drift/releases/latest/download/Drift.dmg)** and drag Drift into Applications.
-2. Open it. Drift isn't notarized yet, so the first time macOS may block it: go to **System Settings → Privacy & Security** and click **Open Anyway**.
-3. Hover the notch. Drift updates itself from then on.
+**Easiest:** paste this in Terminal. It downloads the latest Drift, installs it and opens it, with no Gatekeeper warning ([read the script](docs/install.sh)):
 
-Requires macOS 13 or later on Apple silicon.
+```sh
+curl -fsSL https://faatehsultan.github.io/drift/install.sh | bash
+```
+
+**Or download it:**
+
+1. Get **[Drift.dmg](https://github.com/faatehsultan/drift/releases/latest/download/Drift.dmg)** and drag Drift into Applications.
+2. Open it. macOS will say **"Drift Not Opened"** because Drift isn't signed with Apple's paid developer certificate. Click **Done**.
+3. Go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. You only do this once.
+
+Requires macOS 13 or later on Apple silicon. Drift updates itself after that.
 
 ### Hotkeys
 

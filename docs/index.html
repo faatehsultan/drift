@@ -265,6 +265,38 @@
   @keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.18); } }
   .foot-word { font-size: clamp(90px, 22vw, 300px); font-weight: 900; letter-spacing: -0.06em; line-height: .8; text-align: center; margin: 30px 0 -0.12em; background: linear-gradient(180deg, rgba(139,108,255,0.22), rgba(139,108,255,0) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; pointer-events: none; }
 
+
+  /* Install guide modal */
+  .modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(4,3,10,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .modal.open { opacity: 1; pointer-events: auto; }
+  .sheet { position: relative; width: min(760px, 100%); max-height: calc(100vh - 40px); overflow: auto; border-radius: 26px; border: 1px solid rgba(255,255,255,0.1); background: linear-gradient(180deg, rgba(30,22,64,0.96), rgba(12,10,22,0.98)); box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03) inset; padding: 32px; transform: translateY(18px) scale(.97); transition: transform .45s var(--ease); }
+  .modal.open .sheet { transform: none; }
+  .sheet .x { position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--dim); font-size: 18px; cursor: pointer; }
+  .sheet .x:hover { color: var(--text); background: var(--card2); }
+  .sheet h3 { font-size: 26px; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .sheet .why { color: var(--dim); font-size: 14.5px; max-width: 560px; }
+  .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 22px; }
+  .st { border: 1px solid var(--line); background: rgba(255,255,255,0.04); border-radius: 18px; padding: 16px; }
+  .st .n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--grad); color: #000; font-weight: 800; font-size: 13px; }
+  .st b { display: block; margin: 10px 0 4px; font-size: 15px; }
+  .st p { color: var(--dim); font-size: 13.5px; }
+  .st .pic { height: 74px; border-radius: 12px; background: rgba(0,0,0,0.35); border: 1px solid var(--line); margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 12px; color: var(--dim); }
+  .pic .ico { width: 38px; height: 38px; border-radius: 9px; }
+  .pic .fold { width: 40px; height: 32px; border-radius: 6px; background: #5aa0f0; }
+  .pic .warn { font-weight: 700; color: var(--text); font-size: 12px; text-align: center; line-height: 1.3; }
+  .pic .warn span { display: inline-block; margin-top: 6px; padding: 3px 14px; border-radius: 999px; background: #3478f6; color: #fff; font-weight: 600; }
+  .pic .oa { padding: 5px 12px; border-radius: 8px; background: rgba(255,255,255,0.12); color: var(--text); font-weight: 600; box-shadow: 0 0 0 2px var(--pink); }
+  .st a.link { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--cyan); }
+  .orcmd { display: flex; align-items: center; gap: 14px; margin: 26px 0 12px; color: var(--faint); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+  .orcmd::before, .orcmd::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .cmd { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: rgba(0,0,0,0.45); border-radius: 14px; padding: 10px 10px 10px 16px; }
+  .cmd code { flex: 1; background: none; padding: 0; font-size: 13.5px; color: #e9e6ff; overflow-x: auto; white-space: nowrap; }
+  .cmd button { border: 0; cursor: pointer; font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 10px; background: #fff; color: #000; transition: transform .2s var(--ease); }
+  .cmd button:hover { transform: scale(1.04); }
+  .cmd-note { color: var(--faint); font-size: 12.5px; margin-top: 8px; }
+  .cmd-note a { text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 760px) { .steps3 { grid-template-columns: 1fr; } .sheet { padding: 24px 18px; } }
+
   .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s var(--ease); }
   .reveal.in { opacity: 1; transform: none; }
 
@@ -466,7 +498,7 @@
     <div class="faq">
       <details><summary>Is it really free?</summary><p>Yes, and open source under the GPL-3.0. Use everything, read the code, or help build it on <a href="https://github.com/faatehsultan/drift" style="text-decoration:underline">GitHub</a>.</p></details>
       <details><summary>Does it need a Mac with a notch?</summary><p>No. On other Macs and external displays, Drift draws a slim black pill at the top center that works the same way.</p></details>
-      <details><summary>macOS says it can't open Drift. What do I do?</summary><p>Open System Settings → Privacy &amp; Security, scroll down and click Open Anyway. You only need to do this once.</p></details>
+      <details><summary>macOS says "Drift Not Opened". What do I do?</summary><p>Click Done, then open System Settings → Privacy &amp; Security, scroll down and click Open Anyway. You only need to do this once. Or install with one Terminal command, which skips the warning: <code>curl -fsSL https://faatehsultan.github.io/drift/install.sh | bash</code>. <a href="#" data-guide style="text-decoration:underline">See the guide</a>.</p></details>
       <details><summary>Do I need a YouTube Music account?</summary><p>No. Search and playback work without one. Sign in to see your likes, playlists and mixes.</p></details>
       <details><summary>What happens if music is playing in my browser and in Drift?</summary><p>Only one plays at a time. Starting something in Drift pauses the other app, and starting the other app pauses Drift. When both have something loaded, Drift's own player stays in front. You can turn this off in Settings → General → Media.</p></details>
       <details><summary>How do updates work?</summary><p>Drift checks once a day and offers new versions with release notes. You can also use Check for Updates… in the menu.</p></details>
@@ -497,7 +529,7 @@
       <div class="foot-cols">
         <div><h5>Product</h5><a href="#features">Features</a><a href="#media">Music</a><a href="#yours">Customize</a><a href="#privacy">Privacy</a></div>
         <div><h5>Project</h5><a href="https://github.com/faatehsultan/drift">Source code</a><a href="https://github.com/faatehsultan/drift/releases">Release notes</a><a href="https://github.com/faatehsultan/drift/issues/new/choose">Report a bug</a><a href="https://github.com/faatehsultan/drift/blob/main/CONTRIBUTING.md">Contribute</a></div>
-        <div><h5>Help</h5><a href="#faq">FAQ</a><a href="#faq">Install help</a><a href="https://github.com/faatehsultan/drift/blob/main/LICENSE">License (GPL-3.0)</a></div>
+        <div><h5>Help</h5><a href="#faq">FAQ</a><a href="#" data-guide>Install help</a><a href="https://github.com/faatehsultan/drift/blob/main/LICENSE">License (GPL-3.0)</a></div>
       </div>
     </div>
     <div class="foot-bottom">
@@ -506,6 +538,30 @@
     </div>
     <div class="foot-word" aria-hidden="true">drift</div>
   </footer>
+</div>
+
+
+<div class="modal" id="guide" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+  <div class="sheet">
+    <button class="x" data-close aria-label="Close">✕</button>
+    <h3 id="guide-title">Your download is on its way 🎉</h3>
+    <p class="why">Drift is free and open source, but it isn't signed with Apple's paid developer certificate, so macOS asks you to confirm it once. Here's how:</p>
+    <div class="steps3">
+      <div class="st"><span class="n">1</span><b>Drag to Applications</b><p>Open <code>Drift.dmg</code> and drag Drift into the Applications folder.</p>
+        <div class="pic"><span class="ico" style="background:url(logo.png) center/cover"></span><span style="color:var(--pink)">→</span><span class="fold"></span></div></div>
+      <div class="st"><span class="n">2</span><b>Open it, click Done</b><p>The first time, macOS shows "Drift Not Opened". Just click Done.</p>
+        <div class="pic"><div class="warn">"Drift" Not Opened<br><span>Done</span></div></div></div>
+      <div class="st"><span class="n">3</span><b>Click Open Anyway</b><p>System Settings → Privacy &amp; Security, scroll down, click Open Anyway.</p>
+        <div class="pic"><span class="oa">Open Anyway</span></div>
+        <a class="link" href="x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension">Open Privacy &amp; Security →</a></div>
+    </div>
+    <div class="orcmd">or skip all that</div>
+    <div class="cmd">
+      <code id="cmd-text">curl -fsSL https://faatehsultan.github.io/drift/install.sh | bash</code>
+      <button id="cmd-copy" type="button">Copy</button>
+    </div>
+    <p class="cmd-note">Paste it in Terminal. It downloads the latest Drift, installs it and opens it, with no warning. <a href="https://github.com/faatehsultan/drift/blob/main/docs/install.sh">Read the script</a>.</p>
+  </div>
 </div>
 
 <script>
@@ -634,6 +690,21 @@ fetch("https://api.github.com/repos/faatehsultan/drift")
   .then(r => r.ok ? r.json() : null)
   .then(d => { if (d && d.stargazers_count > 0) { const n = d.stargazers_count.toLocaleString(); document.getElementById("stars").textContent = "★ " + n; document.getElementById("stars2").textContent = "★ " + n; } })
   .catch(() => {});
+
+
+// Install guide: shows while the download starts, or from "Install help".
+const guide = document.getElementById("guide");
+const openGuide = () => { guide.classList.add("open"); document.body.style.overflow = "hidden"; };
+const closeGuide = () => { guide.classList.remove("open"); document.body.style.overflow = ""; };
+document.querySelectorAll("[data-download]").forEach(a => a.addEventListener("click", () => setTimeout(openGuide, 350)));
+document.querySelectorAll("[data-guide]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); openGuide(); }));
+guide.addEventListener("click", e => { if (e.target === guide || e.target.hasAttribute("data-close")) closeGuide(); });
+addEventListener("keydown", e => { if (e.key === "Escape") closeGuide(); });
+document.getElementById("cmd-copy").addEventListener("click", async e => {
+  try { await navigator.clipboard.writeText(document.getElementById("cmd-text").textContent); e.target.textContent = "Copied ✓"; }
+  catch { e.target.textContent = "Select it ↑"; }
+  setTimeout(() => e.target.textContent = "Copy", 1800);
+});
 
 // Live clock in the fake menu bar
 const fmt = () => new Date().toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });

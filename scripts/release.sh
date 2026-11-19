@@ -23,7 +23,8 @@ ZIP="dist/Drift-$V.zip"
 DMG="dist/Drift.dmg"
 rm -f "$ZIP" "$DMG"
 ditto -c -k --sequesterRsrc --keepParent build/Drift.app "$ZIP"
-hdiutil create -volname "Drift" -srcfolder build/Drift.app -ov -format UDZO "$DMG" >/dev/null
+# DMG with "drag to Applications" and the one-time "Open Anyway" steps on its background.
+bash scripts/make-dmg.sh build/Drift.app "$DMG"
 
 # Release notes: commit subjects since the previous tag.
 PREV="$(git describe --tags --abbrev=0 "v$V^" 2>/dev/null || true)"
