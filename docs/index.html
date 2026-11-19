@@ -29,26 +29,60 @@
     radial-gradient(25% 25% at 88% 30%, rgba(255,95,168,0.10), transparent 70%); }
   .noise { position: fixed; inset: 0; pointer-events: none; z-index: -1; opacity: .035; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
 
-  nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(18px); background: rgba(6,5,12,0.6); border-bottom: 1px solid transparent; transition: border-color .3s; }
-  nav.scrolled { border-color: var(--line); }
-  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
-  .brand img { width: 30px; height: 30px; }
-  .nav-links { display: flex; gap: 28px; color: var(--dim); font-size: 14px; }
-  .nav-links a:hover { color: var(--text); }
-  .nav-cta { font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 10px; background: #fff; color: #000; }
+  /* Floating glass nav */
+  nav { position: fixed; top: 14px; left: 0; right: 0; z-index: 30; pointer-events: none; }
+  nav .wrap { pointer-events: auto; max-width: 1040px; height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px 0 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); background: rgba(16,13,30,0.45); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); box-shadow: 0 10px 40px rgba(0,0,0,0.25); transition: max-width .5s var(--ease), background .3s, box-shadow .3s; }
+  nav.scrolled .wrap { max-width: 900px; background: rgba(12,10,24,0.78); box-shadow: 0 16px 50px rgba(0,0,0,0.5); }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 750; font-size: 18px; letter-spacing: -0.01em; }
+  .brand img { width: 30px; height: 30px; transition: transform .5s var(--ease); }
+  .brand:hover img { transform: rotate(-8deg) scale(1.08); }
+  .nav-links { display: flex; gap: 2px; font-size: 14px; }
+  .nav-links a { color: var(--dim); padding: 7px 13px; border-radius: 10px; transition: color .2s, background .2s; }
+  .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .nav-cta { font-size: 14px; font-weight: 600; height: 36px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 11px; background: #fff; color: #000; transition: transform .2s var(--ease), box-shadow .3s; }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(139,108,255,0.45); }
 
-  .hero { text-align: center; padding: 72px 0 0; }
-  .pill { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--dim); border: 1px solid var(--line); padding: 6px 14px; border-radius: 999px; background: var(--card); }
-  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
-  h1 { font-size: clamp(44px, 7.5vw, 92px); line-height: 1; letter-spacing: -0.045em; font-weight: 800; margin: 24px 0 20px; }
-  .sub { color: var(--dim); font-size: clamp(17px, 2vw, 20px); max-width: 640px; margin: 0 auto; }
-  .cta { display: flex; gap: 12px; justify-content: center; margin-top: 34px; flex-wrap: wrap; }
-  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 14px; font-weight: 600; font-size: 16px; transition: transform .2s var(--ease), box-shadow .3s; }
+  /* Hero */
+  .hero { position: relative; text-align: center; padding: 150px 0 0; }
+  .hero-bg { position: absolute; inset: -40px -50vw 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .hero-bg .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px); background-size: 64px 64px; -webkit-mask-image: radial-gradient(60% 50% at 50% 22%, #000 0%, transparent 75%); mask-image: radial-gradient(60% 50% at 50% 22%, #000 0%, transparent 75%); }
+  .hero-bg .beam { position: absolute; top: -260px; left: 50%; width: 1100px; height: 760px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(139,108,255,0.55), rgba(255,95,168,0.18) 45%, transparent 75%); filter: blur(30px); animation: breathe 8s ease-in-out infinite; }
+  @keyframes breathe { 50% { opacity: .7; transform: translateX(-50%) scale(1.06); } }
+  .hero-bg .orb { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #fff; box-shadow: 0 0 14px 3px rgba(139,108,255,0.8); opacity: .0; animation: floatUp 9s linear infinite; }
+  @keyframes floatUp { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .7; } 100% { transform: translateY(-420px); opacity: 0; } }
+
+  .announce { display: inline-flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text); padding: 5px 14px 5px 5px; border-radius: 999px; border: 1px solid transparent; background: linear-gradient(rgba(14,12,26,0.9), rgba(14,12,26,0.9)) padding-box, linear-gradient(90deg, rgba(79,227,255,.6), rgba(139,108,255,.6), rgba(255,95,168,.6)) border-box; box-shadow: 0 0 30px rgba(139,108,255,0.25); transition: transform .3s var(--ease); animation: rise .8s var(--ease) both; }
+  .announce:hover { transform: translateY(-2px); }
+  .announce .new { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #000; background: var(--grad); padding: 3px 9px; border-radius: 999px; }
+  .announce .arr { color: var(--dim); transition: transform .3s var(--ease); }
+  .announce:hover .arr { transform: translateX(3px); color: var(--text); }
+
+  h1 { font-size: clamp(48px, 8vw, 104px); line-height: .98; letter-spacing: -0.05em; font-weight: 850; margin: 26px 0 22px; }
+  h1 .line { display: inline-block; animation: rise .9s var(--ease) both; }
+  h1 .line + br + .line { animation-delay: .12s; }
+  .shimmer { background: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink), var(--violet), var(--cyan)); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: rise .9s .12s var(--ease) both, shimmer 6s linear infinite; padding-bottom: .06em; }
+  @keyframes shimmer { to { background-position: 200% center; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(26px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  .sub { color: var(--dim); font-size: clamp(17px, 2vw, 20px); max-width: 660px; margin: 0 auto; animation: rise .9s .24s var(--ease) both; }
+  .cta { display: flex; gap: 12px; justify-content: center; margin-top: 36px; flex-wrap: wrap; animation: rise .9s .34s var(--ease) both; }
+  .btn { position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 15px 26px; border-radius: 15px; font-weight: 650; font-size: 16px; transition: transform .25s var(--ease), box-shadow .3s, background .2s; }
   .btn:hover { transform: translateY(-2px) scale(1.02); }
-  .btn.primary { background: #fff; color: #000; box-shadow: 0 12px 50px rgba(139,108,255,0.4); }
-  .btn.ghost { border: 1px solid var(--line); background: var(--card); }
+  .btn.primary { background: #fff; color: #000; box-shadow: 0 0 0 1px rgba(255,255,255,0.7), 0 12px 40px -8px rgba(139,108,255,0.75), -18px 0 50px -16px rgba(79,227,255,0.55), 18px 0 50px -16px rgba(255,95,168,0.55); }
+  .btn.primary:hover { box-shadow: 0 0 0 1px #fff, 0 16px 50px -6px rgba(139,108,255,0.9), -22px 0 60px -14px rgba(79,227,255,0.7), 22px 0 60px -14px rgba(255,95,168,0.7); }
+  .btn.ghost { border: 1px solid var(--line); background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); }
+  .btn.ghost:hover { background: rgba(255,255,255,0.08); }
+  .btn .count { font-size: 13px; color: var(--dim); padding-left: 10px; margin-left: 2px; border-left: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .btn .count:empty { display: none; }
+  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: 26px; color: var(--faint); font-size: 13.5px; animation: rise .9s .44s var(--ease) both; }
+  .trust span { display: inline-flex; align-items: center; gap: 7px; }
+  .trust svg { color: var(--green); }
   .meta { margin-top: 14px; font-size: 13px; color: var(--faint); }
+
+  /* Showcase tilts up into place */
+  .show-wrap { position: relative; perspective: 1600px; margin-top: 70px; }
+  .show-glow { position: absolute; left: 8%; right: 8%; top: 12%; bottom: -4%; background: var(--grad); filter: blur(90px); opacity: .28; z-index: -1; border-radius: 50%; }
+  .show-wrap .showcase { margin-top: 0; transform: rotateX(16deg) scale(.95) translateY(10px); transform-origin: 50% 0; opacity: .0; transition: transform 1.4s var(--ease), opacity 1s ease; }
+  .show-wrap .showcase.flat { transform: none; opacity: 1; }
 
   /* ---------- Showcase ---------- */
   .showcase { margin: 64px auto 0; display: grid; grid-template-columns: 230px 1fr; gap: 0; border: 1px solid var(--line); border-radius: 26px; overflow: hidden; background: rgba(255,255,255,0.02); box-shadow: 0 50px 140px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.02) inset; text-align: left; }
@@ -262,19 +296,35 @@
 
 <div class="wrap">
   <header class="hero">
-    <span class="pill"><span class="dot"></span>Free and open source · works on every Mac, notch or not</span>
-    <h1>Your notch,<br><span class="grad">finally useful.</span></h1>
+    <div class="hero-bg" aria-hidden="true">
+      <div class="grid"></div><div class="beam"></div>
+      <span class="orb" style="left:18%;top:62%;animation-delay:0s"></span>
+      <span class="orb" style="left:31%;top:70%;animation-delay:3s;width:5px;height:5px"></span>
+      <span class="orb" style="left:69%;top:66%;animation-delay:1.5s"></span>
+      <span class="orb" style="left:82%;top:72%;animation-delay:4.5s;width:5px;height:5px"></span>
+      <span class="orb" style="left:50%;top:78%;animation-delay:6s;width:6px;height:6px"></span>
+    </div>
+    <a class="announce" href="#media"><span class="new">New</span>Detects music in your browser, with zero clashes <span class="arr">→</span></a>
+    <h1><span class="line">Your notch,</span><br><span class="line shimmer">finally useful.</span></h1>
     <p class="sub">Drift turns the MacBook notch into a living control center. A native YouTube Music player with search and lyrics, control of whatever else is playing, a file tray, your next meeting, focus timers and AI approvals, one hover away.</p>
     <div class="cta">
       <a class="btn primary" data-download href="#">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.62c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.27-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.78.74 2.99.72 1.24-.02 2.02-1.12 2.77-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.65zM14.1 5.9c.63-.77 1.06-1.83.94-2.9-.91.04-2.02.61-2.67 1.37-.58.67-1.1 1.76-.96 2.8 1.02.08 2.06-.52 2.69-1.27z"/></svg>
         Download for macOS
       </a>
-      <a class="btn ghost" href="https://github.com/faatehsultan/drift"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>Star on GitHub</a>
+      <a class="btn ghost" href="https://github.com/faatehsultan/drift"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>Star on GitHub<span class="count" id="stars2"></span></a>
     </div>
-    <p class="meta">macOS 13 or later · Apple silicon · updates itself</p>
+    <div class="trust">
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Free and open source</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>No account needed</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>No tracking</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Updates itself</span>
+      <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>macOS 13+ · Apple silicon</span>
+    </div>
 
-    <div class="showcase reveal" id="showcase">
+    <div class="show-wrap">
+      <div class="show-glow" aria-hidden="true"></div>
+    <div class="showcase" id="showcase">
       <div class="side" id="side"><h4>What it can do</h4></div>
       <div class="stage" id="stage">
         <div class="menubar"><span><b></b>File&nbsp;&nbsp;Edit&nbsp;&nbsp;View&nbsp;&nbsp;Window</span><span id="clock">Thu 9:41</span></div>
@@ -287,6 +337,7 @@
         <div class="file-fly" id="fly"></div>
         <div class="cursor" id="cursor"><svg width="16" height="20" viewBox="0 0 16 20"><path d="M1 1l13 10.5-6 .7 3.4 6.6-2.4 1.2-3.4-6.6L1 17z" fill="#fff" stroke="#000" stroke-width="1"/></svg></div>
       </div>
+    </div>
     </div>
   </header>
 
@@ -563,6 +614,12 @@ new IntersectionObserver((es, obs) => {
   if (es[0].isIntersecting) { show(0); obs.disconnect(); }
 }, { threshold: 0.3 }).observe(showcase);
 
+
+// Showcase tilts up into place once it's on screen
+new IntersectionObserver((es, obs) => {
+  if (es[0].isIntersecting) { showcase.classList.add("flat"); obs.disconnect(); }
+}, { threshold: 0.15 }).observe(showcase);
+
 // Scroll reveal and nav border
 const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("in")), { threshold: 0.12 });
 document.querySelectorAll(".reveal").forEach(el => io.observe(el));
@@ -575,7 +632,7 @@ document.querySelectorAll("#settings .sw").forEach(sw => sw.addEventListener("cl
 // GitHub star count on the nav button (quietly skipped if the API is unavailable)
 fetch("https://api.github.com/repos/faatehsultan/drift")
   .then(r => r.ok ? r.json() : null)
-  .then(d => { if (d && d.stargazers_count > 0) document.getElementById("stars").textContent = "★ " + d.stargazers_count; })
+  .then(d => { if (d && d.stargazers_count > 0) { const n = d.stargazers_count.toLocaleString(); document.getElementById("stars").textContent = "★ " + n; document.getElementById("stars2").textContent = "★ " + n; } })
   .catch(() => {});
 
 // Live clock in the fake menu bar
