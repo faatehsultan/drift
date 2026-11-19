@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Drift</string>
+	<key>CFBundleExecutable</key>
+	<string>Drift</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.drift.player</string>
+	<key>CFBundleName</key>
+	<string>Drift</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>0</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Drift shows your upcoming meetings in the notch.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Drift shows your upcoming meetings in the notch.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Drift's mirror shows your camera so you can check how you look.</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://faatehsultan.github.io/drift/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>kyDOdfUF82AM3+HnANanz/xTR7/kv9qaEjcKue2diq0=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
+</dict>
+</plist>

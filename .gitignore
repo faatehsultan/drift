@@ -1,0 +1,23 @@
+# Build output
+.build/
+build/
+dist/
+DerivedData/
+
+# Local tools (Sparkle CLI is downloaded by scripts/setup-sparkle.sh)
+.tools/
+
+# Xcode / SwiftPM user state
+.swiftpm/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# macOS
+.DS_Store
+._*
+
+# Never commit signing secrets
+*private-key*
+*.p12
+*.pem
+.env
