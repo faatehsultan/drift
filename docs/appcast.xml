@@ -6,5 +6,14 @@
     <description>Updates for Drift</description>
     <language>en</language>
     <!-- ITEMS -->
+    <item>
+      <title>Version 1.0.3</title>
+      <pubDate>Thu, 19 Nov 2026 20:36:03 +0000</pubDate>
+      <sparkle:version>4</sparkle:version>
+      <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[<ul><li>Bug fixes and improvements</li></ul>]]></description>
+      <enclosure url="https://github.com/faatehsultan/drift/releases/download/v1.0.3/Drift-1.0.3.zip" type="application/octet-stream" sparkle:edSignature="JmIes3RiOHut1f1Yb5eWy0ZT8iZjBFcqtsgE/nGREE5BAhMZMuRUy5F3HDFli288/lI4PJJCb1sNNh91hHxwBw==" length="2743889" />
+    </item>
   </channel>
 </rss>
