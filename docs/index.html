@@ -179,6 +179,32 @@
   @keyframes bob { 50% { transform: translateY(-10px); } }
   footer { border-top: 1px solid var(--line); padding: 26px 0 44px; color: var(--faint); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
+
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 48px; }
+  .duo .bx { min-height: 0; }
+  .feat { list-style: none; margin-top: 16px; display: grid; gap: 8px; }
+  .feat li { display: flex; gap: 10px; color: var(--dim); font-size: 15px; }
+  .feat li::before { content: "✓"; color: var(--green); font-weight: 700; }
+  .feat.basic li::before { color: var(--cyan); }
+  .player-mock { margin-top: 20px; border-radius: 18px; background: rgba(0,0,0,0.45); border: 1px solid var(--line); padding: 14px; display: flex; gap: 12px; align-items: center; }
+  .player-mock .pa { width: 56px; height: 56px; border-radius: 12px; flex-shrink: 0; }
+  .player-mock .pt { font-weight: 700; font-size: 14px; } .player-mock .ps { color: var(--dim); font-size: 12px; }
+  .search-mock { margin-top: 20px; border-radius: 18px; background: rgba(0,0,0,0.45); border: 1px solid var(--line); padding: 12px; }
+  .search-mock .q { border-radius: 10px; background: rgba(255,255,255,0.08); padding: 8px 12px; font-size: 13px; color: var(--text); margin-bottom: 8px; }
+  .search-mock .r { display: flex; gap: 10px; align-items: center; padding: 6px 4px; font-size: 13px; }
+  .search-mock .r i { width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0; }
+  .search-mock .r span { color: var(--dim); font-size: 12px; margin-left: auto; }
+  .handoff { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+  .hs { border: 1px solid var(--line); background: var(--card); border-radius: 22px; padding: 22px; }
+  .hs .scene { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 13px; font-weight: 600; flex-wrap: wrap; }
+  .hs .app { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.08); }
+  .hs .app.on { background: rgba(74,222,128,0.16); color: var(--green); }
+  .hs .app.off { color: var(--faint); text-decoration: line-through; }
+  .hs .arrow { color: var(--faint); }
+  .hs b { display: block; font-size: 17px; margin-bottom: 6px; }
+  .hs p { color: var(--dim); font-size: 15px; }
+  @media (max-width: 900px) { .duo, .handoff { grid-template-columns: 1fr; } }
+
   .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s var(--ease); }
   .reveal.in { opacity: 1; transform: none; }
 
@@ -200,7 +226,7 @@
 <nav id="nav"><div class="wrap">
   <a class="brand" href="#"><img src="logo.png" alt="">Drift</a>
   <div class="nav-links">
-    <a href="#features">Features</a><a href="#yours">Customize</a><a href="#privacy">Privacy</a><a href="#faq">FAQ</a><a href="https://github.com/faatehsultan/drift">GitHub</a>
+    <a href="#features">Features</a><a href="#media">Music</a><a href="#yours">Customize</a><a href="#privacy">Privacy</a><a href="#faq">FAQ</a><a href="https://github.com/faatehsultan/drift">GitHub</a>
   </div>
   <a class="nav-cta" data-download href="#">Download</a>
 </div></nav>
@@ -209,7 +235,7 @@
   <header class="hero">
     <span class="pill"><span class="dot"></span>Free and open source · works on every Mac, notch or not</span>
     <h1>Your notch,<br><span class="grad">finally useful.</span></h1>
-    <p class="sub">Drift turns the MacBook notch into a living control center. Music and lyrics, media from any app, a file tray, your next meeting, focus timers and AI approvals, one hover away.</p>
+    <p class="sub">Drift turns the MacBook notch into a living control center. A native YouTube Music player with search and lyrics, control of whatever else is playing, a file tray, your next meeting, focus timers and AI approvals, one hover away.</p>
     <div class="cta">
       <a class="btn primary" data-download href="#">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.62c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.27-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.78.74 2.99.72 1.24-.02 2.02-1.12 2.77-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.65zM14.1 5.9c.63-.77 1.06-1.83.94-2.9-.91.04-2.02.61-2.67 1.37-.58.67-1.1 1.76-.96 2.8 1.02.08 2.06-.52 2.69-1.27z"/></svg>
@@ -242,8 +268,8 @@
       <p class="lead">Point at the top of your screen and Drift springs open. Move away and it melts back into the notch.</p>
     </div>
     <div class="bento">
-      <div class="bx w4"><span class="tag" style="color:var(--pink)">Music</span><h3>A real player, not a web page in a box</h3><p>Search YouTube Music, browse albums and artists, edit your queue, like songs and watch synced lyrics scroll with the beat. The colors follow the album art.</p><div class="glow" style="background:var(--pink)"></div></div>
-      <div class="bx w2"><span class="tag" style="color:var(--cyan)">Any app</span><h3>Plays nice with your browser</h3><p>Music or video in Chrome, Safari, Arc or Spotify shows up too, with play, pause, skip and seek.</p><div class="glow" style="background:var(--cyan)"></div></div>
+      <div class="bx w4"><span class="tag" style="color:var(--pink)">Music</span><h3>Native YouTube Music, built in</h3><p>Search with live suggestions, browse albums and artists, edit your queue, like songs and watch synced lyrics scroll with the beat. The colors follow the album art.</p><div class="glow" style="background:var(--pink)"></div></div>
+      <div class="bx w2"><span class="tag" style="color:var(--cyan)">Any app</span><h3>Detects anything playing</h3><p>Music or video in Chrome, Safari, Arc or Spotify shows up too, with play, pause, skip and seek. No clashes: one thing plays at a time.</p><div class="glow" style="background:var(--cyan)"></div></div>
       <div class="bx w2"><span class="tag" style="color:#60a5fa">Tray</span><h3>Drop files on the notch</h3><p>Park files, AirDrop them, merge PDFs, or convert images, video and docs in a click.</p><div class="glow" style="background:#60a5fa"></div></div>
       <div class="bx w2"><span class="tag" style="color:var(--red)">Calendar</span><h3>Never late again</h3><p>Your next meeting, a live countdown and a Join button for Zoom, Meet, Teams and Webex.</p><div class="glow" style="background:var(--red)"></div></div>
       <div class="bx w2"><span class="tag" style="color:var(--orange)">Focus</span><h3>Timers that live in the notch</h3><p>Timers and Pomodoro count down right beside the camera. Plus notes, to-dos, Shortcuts, clipboard history and a mirror.</p><div class="glow" style="background:var(--orange)"></div></div>
@@ -251,6 +277,72 @@
       <div class="bx w3"><span class="tag" style="color:var(--green)">Live activities</span><h3>Like the Dynamic Island, but for Mac</h3><p>Now playing, timers, meetings, charging and new files show around the camera, and a little pull-down greets every change.</p><div class="vis"><div class="mini-notch"><span style="width:16px;height:16px;border-radius:4px;background:var(--grad)"></span><span class="eq"><i></i><i></i><i></i><i></i></span></div></div><div class="glow" style="background:var(--green)"></div></div>
     </div>
     <div class="logos"><span>YouTube Music</span><span>Chrome</span><span>Safari</span><span>Arc</span><span>Spotify</span><span>Apple Music</span><span>Zoom</span><span>Google Meet</span><span>Teams</span><span>Claude Code</span><span>Shortcuts</span><span>AirDrop</span></div>
+  </section>
+
+  <section id="media" class="reveal">
+    <div class="center">
+      <div class="eyebrow grad">Two ways to listen, zero clashes</div>
+      <h2>A real YouTube Music app.<br>Plus everything else you play.</h2>
+      <p class="lead">Drift has its own native YouTube Music player, and it also picks up whatever's playing in your browser or other apps. They never talk over each other.</p>
+    </div>
+    <div class="duo">
+      <div class="bx">
+        <span class="tag" style="color:var(--pink)">Built in</span>
+        <h3>Native YouTube Music</h3>
+        <p>Not a website squeezed into a popup. Every screen is native and fast.</p>
+        <ul class="feat">
+          <li>Search with live suggestions, plus songs, artists, albums and playlists</li>
+          <li>Album and artist pages, your likes and playlists</li>
+          <li>A queue you can reorder, shuffle, repeat and likes</li>
+          <li>Synced lyrics that scroll with the song</li>
+        </ul>
+        <div class="search-mock">
+          <div class="q">🔍 the weeknd</div>
+          <div class="r"><i style="background:linear-gradient(135deg,#ff5fa8,#8b6cff)"></i>Blinding Lights<span>Song</span></div>
+          <div class="r"><i style="background:linear-gradient(135deg,#4fe3ff,#8b6cff);border-radius:50%"></i>The Weeknd<span>Artist</span></div>
+          <div class="r"><i style="background:linear-gradient(135deg,#ffa94d,#ff5fa8)"></i>After Hours<span>Album</span></div>
+        </div>
+        <div class="glow" style="background:var(--pink)"></div>
+      </div>
+      <div class="bx">
+        <span class="tag" style="color:var(--cyan)">Detected automatically</span>
+        <h3>Anything else that's playing</h3>
+        <p>YouTube Music in Chrome, a video in Safari, Spotify or Apple Music: Drift sees it and puts it in the notch.</p>
+        <ul class="feat basic">
+          <li>Artwork, title and which app it's playing in</li>
+          <li>Play, pause, skip and seek</li>
+          <li>Live progress and a "now playing" activity in the notch</li>
+          <li>The same hotkeys control whatever's playing</li>
+        </ul>
+        <div class="player-mock">
+          <div class="pa" style="background:linear-gradient(135deg,#ffa94d,#ff6b6b)"></div>
+          <div style="flex:1">
+            <div class="pt">Lo-fi beats to code to</div>
+            <div class="ps">Chillhop Radio</div>
+            <div style="margin-top:6px"><span class="chip">🌐 Playing in Google Chrome</span></div>
+          </div>
+          <span class="play">❚❚</span>
+        </div>
+        <div class="glow" style="background:var(--cyan)"></div>
+      </div>
+    </div>
+    <div class="handoff">
+      <div class="hs">
+        <div class="scene"><span class="app on">♪ Drift</span><span class="arrow">→</span><span class="app off">Chrome</span></div>
+        <b>Play in Drift, the browser pauses</b>
+        <p>Start a song in Drift and whatever was playing elsewhere quietly stops.</p>
+      </div>
+      <div class="hs">
+        <div class="scene"><span class="app on">🌐 Chrome</span><span class="arrow">→</span><span class="app off">Drift</span></div>
+        <b>Play in Chrome, Drift steps aside</b>
+        <p>Hit play in your browser and Drift pauses itself and hands the notch over.</p>
+      </div>
+      <div class="hs">
+        <div class="scene"><span class="app on">⌥⌘P</span><span class="arrow">→</span><span class="app">whatever's playing</span></div>
+        <b>Drift always comes first</b>
+        <p>When both have something, Drift's own player gets priority. Hotkeys go to whoever's in front. One thing plays at a time, and you can turn that off.</p>
+      </div>
+    </div>
   </section>
 
   <section id="yours" class="reveal">
@@ -296,6 +388,7 @@
       <details><summary>Does it need a Mac with a notch?</summary><p>No. On other Macs and external displays, Drift draws a slim black pill at the top center that works the same way.</p></details>
       <details><summary>macOS says it can't open Drift. What do I do?</summary><p>Open System Settings → Privacy &amp; Security, scroll down and click Open Anyway. You only need to do this once.</p></details>
       <details><summary>Do I need a YouTube Music account?</summary><p>No. Search and playback work without one. Sign in to see your likes, playlists and mixes.</p></details>
+      <details><summary>What happens if music is playing in my browser and in Drift?</summary><p>Only one plays at a time. Starting something in Drift pauses the other app, and starting the other app pauses Drift. When both have something loaded, Drift's own player stays in front. You can turn this off in Settings → General → Media.</p></details>
       <details><summary>How do updates work?</summary><p>Drift checks once a day and offers new versions with release notes. You can also use Check for Updates… in the menu.</p></details>
       <details><summary>How do Claude Code approvals work?</summary><p>In Settings → Integrations, click Install hook. Permission requests then show in the notch. If Drift isn't running, Claude Code asks in the terminal as usual.</p></details>
     </div>
@@ -321,13 +414,13 @@ const eq = c => `<span class="eq">${[0,1,2,3].map(() => `<i${c ? ` style="backgr
 const sq = (c) => `<span style="width:16px;height:16px;border-radius:4px;background:${c}"></span>`;
 
 const scenes = [
-  { id: "music", h: "42%", icon: "🎵", name: "Music", desc: "Search, queue, likes", tab: 1,
+  { id: "music", h: "42%", icon: "🎵", name: "YouTube Music", desc: "Native search and player", tab: 1,
     mini: sq("linear-gradient(135deg,#ff5fa8,#8b6cff)") + eq(),
     panel: `<div class="row">${art("#ff5fa8","#8b6cff",34)}<div style="flex:1"><div class="t">Midnight Drive</div><div class="s">Neon Coast · Afterglow</div><div class="prog"><i></i></div><div class="ctrls"><span>⇄</span><span>⏮</span><span class="play">❚❚</span><span>⏭</span><span>♡</span></div></div></div>` },
   { id: "lyrics", h: "52%", icon: "💬", name: "Synced lyrics", desc: "Scrolls with the beat", tab: 1,
     mini: sq("linear-gradient(135deg,#4fe3ff,#8b6cff)") + eq(),
     panel: `<div class="lyr" id="lyr"><div>City lights are fading out</div><div>We're driving through the night</div><div>Hold on, don't let go</div><div>We're chasing every light</div><div>Til the morning comes</div></div>` },
-  { id: "anyapp", h: "46%", icon: "🌐", name: "Any app", desc: "Chrome, Safari, Spotify", tab: 1,
+  { id: "anyapp", h: "46%", icon: "🌐", name: "Any app", desc: "Browser, Spotify, Music", tab: 1,
     mini: sq("linear-gradient(135deg,#ffa94d,#ff6b6b)") + eq("#ffa94d"),
     panel: `<div class="row">${art("#ffa94d","#ff6b6b",34)}<div style="flex:1"><div class="t">Lo-fi beats to code to</div><div class="s">Chillhop Radio</div><div style="margin-top:6px"><span class="chip">🌐 Playing in Google Chrome</span></div><div class="prog"><i></i></div><div class="ctrls" style="max-width:150px"><span>⏮</span><span class="play">❚❚</span><span>⏭</span></div></div></div>` },
   { id: "tray", h: "50%", icon: "📥", name: "File tray", desc: "Drop, AirDrop, convert", tab: 2,
